@@ -9,7 +9,7 @@ const pause = (duration) => {
 const ordersApi = createApi({
   reducerPath: "orders",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080/order",
+    baseUrl: "https://mern-e-commerce-app-api.vercel.app/order",
   }),
   endpoints(builder) {
     return {

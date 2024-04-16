@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const testApi = createApi({
   reducerPath: "testApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8080" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://mern-e-commerce-app-api.vercel.app" }),
   endpoints: (builder) => ({
     uploadFile: builder.mutation({
       query: (data) => ({
