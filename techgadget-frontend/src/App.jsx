@@ -26,6 +26,7 @@ import AuthLayout from "./layouts/auth/AuthLayout";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 
+//Test
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
