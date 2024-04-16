@@ -11,6 +11,9 @@ const {
   getObjectSignedUrl,
 } = require("./utils/s3FileUpload");
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 const graphqlSchema = require("./graphql/schema/schema");
 const graphqlResolver = require("./graphql/resolvers/resolvers");
 
@@ -98,9 +101,7 @@ app.use(
 );
 
 mongoose
-  .connect(
-    "mongodb+srv://khaqt268:Khakhakuku123@cluster0.pfrbpau.mongodb.net/my_store"
-  )
+  .connect(process.env.MONGODB_CONNECT)
   .then((result) => {
     app.listen(8080);
   })
