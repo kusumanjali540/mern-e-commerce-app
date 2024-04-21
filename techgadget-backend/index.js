@@ -17,6 +17,8 @@ dotenv.config();
 const graphqlSchema = require("./graphql/schema/schema");
 const graphqlResolver = require("./graphql/resolvers/resolvers");
 
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 const productRoutes = require("./routes/product");
 const reviewRoutes = require("./routes/review");
 const customerRoutes = require("./routes/customer");

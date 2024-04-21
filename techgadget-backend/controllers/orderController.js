@@ -1,4 +1,5 @@
 const Order = require("../models/order");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.getOrders = async (req, res, next) => {
   try {
@@ -15,13 +16,10 @@ exports.getOrders = async (req, res, next) => {
 
 exports.postOrder = async (req, res, next) => {
   try {
-    // Create cusstomer if not found
-
     // Post the order to database
 
     // Update products quantity
 
-    
     res.status(201).json({
       message: "Order created successfully",
       product: product,
@@ -32,6 +30,32 @@ exports.postOrder = async (req, res, next) => {
     }
     next(err);
   }
+};
+
+exports.createCheckoutSession = async (req, res, next) => {
+  const { products: items } = req.body;
+
+  const lineItems = items.map((item) => ({
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: item.product.name,
+        images: item.product.pictures,
+      },
+      unit_amount: Math.round(item.product.variants[item.variant].price*100),
+    },
+    quantity: item.quantity,
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: lineItems,
+    mode: "payment",
+    success_url: "http://localhost:3000/checkout_success",
+    cancel_url: "http://localhost:3000/",
+  });
+
+  res.json({ id: session.id });
 };
 
 exports.getOrder = async (req, res, next) => {
@@ -60,7 +84,9 @@ exports.updateOrder = async (req, res, next) => {
   try {
     await order.save();
 
-    res.status(200).json({ message: "Order updated successfully", order: order });
+    res
+      .status(200)
+      .json({ message: "Order updated successfully", order: order });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -82,7 +108,9 @@ exports.deleteOrder = async (req, res, next) => {
 
     await Order.findByIdAndRemove(orderId);
 
-    res.status(200).json({ message: "Order deleted successfully", order: order });
+    res
+      .status(200)
+      .json({ message: "Order deleted successfully", order: order });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

@@ -23,6 +23,9 @@ const customerSchema = new Schema({
   address: {
     type: String,
   },
+  country: {
+    type: String,
+  },
   city: {
     type: String,
   },
