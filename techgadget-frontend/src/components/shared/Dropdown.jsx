@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const Dropdown = ({ onChange, options }) => {
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState();
 
   const handleSelectChange = (event) => {
     const selectedValue = event.target.value;

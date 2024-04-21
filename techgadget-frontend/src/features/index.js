@@ -4,6 +4,7 @@ import {
   openModal,
   closeModal,
 } from "./slices/notificationSlice";
+import { updateAddress, resetAddress, addressReducer } from "./slices/addressSlice";
 import { addNewCartItem, deleteCartItem } from "./slices/cartSlice";
 import { clearAuthStorage, setAuthState } from "./slices/adminSlice";
 import { testApi } from "./apis/testApi";
@@ -20,6 +21,7 @@ const store = configureStore({
     notification: notificationReducer,
     cart: cartReducer,
     admin: adminReducer,
+    address: addressReducer,
     [testApi.reducerPath]: testApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
     [reviewsApi.reducerPath]: reviewsApi.reducer,
@@ -46,6 +48,8 @@ export {
   deleteCartItem,
   clearAuthStorage,
   setAuthState,
+  updateAddress,
+  resetAddress
 };
 export { useUploadFileMutation } from "./apis/testApi";
 export { usePostReviewMutation } from "./apis/reviewsApi";
@@ -69,4 +73,5 @@ export {
   useAddOrderMutation,
   useRemoveOrderMutation,
   useEditOrderMutation,
+  useCreateCheckoutSessionMutation
 } from "./apis/ordersApi";

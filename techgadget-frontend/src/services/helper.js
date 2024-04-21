@@ -99,10 +99,68 @@ const capitalizeWords = (str) => {
   );
 };
 
+//Get the product, the quantity and the index of selected variant to calculate the totalPrice of a cart-item product
+const calculateTotalPriceOfCartItem = (productDetail) => {
+  const { product, variant, quantity } = productDetail;
+  if (
+    product &&
+    product.variants &&
+    variant >= 0 &&
+    variant < product.variants.length &&
+    quantity > 0
+  ) {
+    const selectedVariant = product.variants[variant];
+    if (selectedVariant && selectedVariant.price) {
+      return selectedVariant.price * quantity;
+    }
+  }
+  return null;
+};
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1);
+  console.log(dLon);
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ;
+  console.log(a);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  console.log(c); 
+  var d = R * c; // Distance in km
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
+// Helper function to calculate the shipping fee based on the distance between two locations
+const calculateShippingFee = (lat1, lon1) => {
+  const lat2 = 10.847931842960001;
+  const lon2 = 106.75900795023855;
+
+  console.log(lat1, lon1);
+  if (!lat1 || !lon1) {
+    return null;
+  }
+  // Calculate the distance between the two locations
+  const distance = getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2);
+  console.log(distance);
+  // Calculate the shipping fee based on the distance (assuming 1km = 0.1USD)
+  const shippingFee = distance * 0.1;
+  return shippingFee.toFixed(2);
+};
+
 export {
   productObject2FormData,
   getUniqueVariants,
   compareTwoObj,
   findVariantByProperties,
   capitalizeWords,
+  calculateTotalPriceOfCartItem,
+  calculateShippingFee,
 };

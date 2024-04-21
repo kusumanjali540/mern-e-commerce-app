@@ -21,10 +21,11 @@ import ProductsManagement from "./pages/admin/ProductsManagement";
 import CustomersManagement from "./pages/admin/CustomersManagement";
 // import CartsManagement from "./pages/admin/CartsManagement";
 import OrdersManagement from "./pages/admin/OrdersManagement";
-import CheckoutPage from "./pages/CheckoutPage";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
 import AuthLayout from "./layouts/auth/AuthLayout";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
+import CheckoutSuccess from "./pages/checkout/CheckoutSuccess";
 
 //Test
 const router = createBrowserRouter(
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
         <Route path="terms-of-service" element={<TermsOfService />} />
         <Route path="test" element={<Test />} />
         <Route path="checkout" element={<CheckoutPage />} />
+        <Route path="checkout_success" element={<CheckoutSuccess />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

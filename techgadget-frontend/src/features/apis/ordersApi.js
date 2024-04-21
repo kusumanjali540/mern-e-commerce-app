@@ -9,7 +9,7 @@ const pause = (duration) => {
 const ordersApi = createApi({
   reducerPath: "orders",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://mern-e-commerce-app-api.vercel.app/order",
+    baseUrl: "http://localhost:8080/order",
   }),
   endpoints(builder) {
     return {
@@ -73,6 +73,21 @@ const ordersApi = createApi({
           };
         },
       }),
+      createCheckoutSession: builder.mutation({
+        // invalidatesTags: ["Order"],
+        // invalidatesTags: (result, error, order) => {
+        //   return [{ type: 'OrdersOrders', id: order.id }];
+        // },
+        query: (products) => {
+          console.log(products);
+
+          return {
+            url: `/create-checkout-session`,
+            method: "POST",
+            body: products,
+          };
+        },
+      }),
     };
   },
 });
@@ -83,5 +98,6 @@ export const {
   useAddOrderMutation,
   useRemoveOrderMutation,
   useEditOrderMutation,
+  useCreateCheckoutSessionMutation,
 } = ordersApi;
 export { ordersApi };

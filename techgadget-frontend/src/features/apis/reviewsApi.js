@@ -9,7 +9,7 @@ const pause = (duration) => {
 const reviewsApi = createApi({
   reducerPath: "reviews",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://mern-e-commerce-app-api.vercel.app/review",
+    baseUrl: "http://localhost:8080/review",
     // fetchFn: async (...args) => {
     //   await pause(1000);
     //   return fetch(...args);

@@ -4,9 +4,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { useFetchProductQuery } from "../../features/apis/productsApi";
 import CartItemSkeleton from "../loadingSkeletons/CartItemSkeleton";
 import { updateQuantityInCart } from "../../services/useLocalStorageService";
-import {
-  deleteCartItem,
-} from "../../features/slices/cartSlice";
+import { deleteCartItem } from "../../features/slices/cartSlice";
 import { useDispatch } from "react-redux";
 
 const CartItem = ({ cartItem }) => {
@@ -49,8 +47,8 @@ const CartItem = ({ cartItem }) => {
         <td className="w-1/4 h-fit md:w-1/6 lg:w-[12%] 2xl:w-1/12">
           <div className="min-w-28 min-h-28 md:w-full">
             <img
-              src="/img/product_speaker.jpg"
-              alt="pictures"
+              src={data.product.pictures[0]}
+              alt={data.product.name}
               className="object-cover"
             />
           </div>
@@ -96,7 +94,10 @@ const CartItem = ({ cartItem }) => {
         </td>
         <td className="">
           <div className="w-full h-full flex justify-center items-center">
-            ${(data.product.variants[cartItem.variant].price * quantity).toFixed(2)}
+            $
+            {(data.product.variants[cartItem.variant].price * quantity).toFixed(
+              2
+            )}
           </div>
         </td>
       </tr>

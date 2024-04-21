@@ -3,7 +3,6 @@ import Markdown from "markdown-to-jsx";
 
 const ProductDescription = React.memo(
   ({ product }) => {
-    console.log(product.description);
     const markDownText = product.description;
 
     return (
