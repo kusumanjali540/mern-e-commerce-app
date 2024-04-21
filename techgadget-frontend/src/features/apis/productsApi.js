@@ -38,6 +38,25 @@ const productsApi = createApi({
           };
         },
       }),
+      fetchAllProducts: builder.query({
+        // providesTags: ["Product"],
+        // providesTags: (result, error, user) => {
+        //   const tags = result.map((product) => {
+        //     return { type: 'Product', id: product.id };
+        //   });
+        //   tags.push({ type: 'UsersProducts', id: user.id });
+        //   return tags;
+        // },
+        query: () => {
+          return {
+            url: `/all-products`,
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+        },
+      }),
       fetchProducts: builder.query({
         // providesTags: ["Product"],
         // providesTags: (result, error, user) => {
@@ -101,5 +120,6 @@ export const {
   useAddProductMutation,
   useRemoveProductMutation,
   useEditProductMutation,
+  useFetchAllProductsQuery
 } = productsApi;
 export { productsApi };

@@ -60,6 +60,7 @@ export {
   useAddProductMutation,
   useRemoveProductMutation,
   useEditProductMutation,
+  useFetchAllProductsQuery
 } from "./apis/productsApi";
 export {
   useFetchCustomersQuery,

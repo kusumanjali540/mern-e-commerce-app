@@ -34,9 +34,7 @@ const ProductInfo = ({ product, error, isFetching }) => {
         index: 0,
       });
     }
-  }, [isFetching, product, selectedVariant]);
-
-  console.log(selectedVariant);
+  }, [isFetching, product]);
 
   const handleDecreaseQuantity = () => {
     if (quantity > 1) {
@@ -73,15 +71,11 @@ const ProductInfo = ({ product, error, isFetching }) => {
     }, 200);
   };
 
-  console.log(selectedVariant);
-
   const handleVariantChange = (value) => {
     const { foundVariant, index } = findVariantByProperties(
       product.variants,
       value
     );
-
-    console.log(foundVariant);
 
     if (!foundVariant) {
       setSelectedVariant({
@@ -93,19 +87,17 @@ const ProductInfo = ({ product, error, isFetching }) => {
         storage: 0,
         index: -1,
       });
+    } else {
+      setSelectedVariant({
+        ...selectedVariant,
+        properties: {
+          ...value,
+        },
+        price: foundVariant.price,
+        storage: foundVariant.quantity,
+        index: index,
+      });
     }
-
-    setSelectedVariant({
-      ...selectedVariant,
-      properties: {
-        ...value,
-      },
-      price: foundVariant.price,
-      storage: foundVariant.quantity,
-      index: index,
-    });
-
-    console.log(selectedVariant);
   };
 
   let content;

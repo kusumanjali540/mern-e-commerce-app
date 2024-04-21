@@ -24,6 +24,8 @@ const CheckoutPage = () => {
   console.log(productArr);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+    
     const fetchProduct = async () => {
       const items = [];
       for (const cartItem of cartItems) {

@@ -4,16 +4,17 @@ import {
   AiOutlineClose,
   AiOutlineSearch,
 } from "react-icons/ai";
-import { useFetchProductQuery, useFetchProductsQuery } from "../../features";
+import { useFetchAllProductsQuery } from "../../features";
+import { Link } from "react-router-dom";
+import SearchItem from "./SearchItem";
 
 const Search = ({ setIsOpen, className }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const { data, error, isFetching } = useFetchProductsQuery();
+  const { data, error, isFetching } = useFetchAllProductsQuery();
   const [searchData, setSearchData] = useState([]);
 
   useEffect(() => {
-    console.log(searchData);
     setSearchData(() => {
       if (data) {
         return data.products.filter((product) => {
@@ -85,16 +86,25 @@ const Search = ({ setIsOpen, className }) => {
         </button>
       </div>
       {searchTerm && (
-        <div>
-          <h1>Products</h1>
-          {searchData.length > 0
-            ? searchData.map((item, index) => (
-                <div key={index}>{/* Render each item here */}</div>
-              ))
-            : "Not found!"}
-          <button className="w-full p-2 flex flex-row justify-between items-center">
-            Search for "{searchTerm}" <AiOutlineArrowRight />
-          </button>
+        <div className="bg-white border-t-2">
+          <div className="py-2">
+            <div className="px-4">
+              <h1>Products</h1>
+              <div className="flex flex-col gap-1">
+                {searchData.length > 0
+                  ? searchData.map((item, index) => (
+                      <Link key={index} to={`/product/${item._id}`} onClick={handleCloseSearch}>
+                        <SearchItem item={item} />
+                      </Link>
+                    ))
+                  : "Not found!"}
+              </div>
+            </div>
+
+            {/* <button className="w-full px-4 pt-2 flex flex-row justify-between items-center border-t-2">
+              Search for "{searchTerm}" <AiOutlineArrowRight />
+            </button> */}
+          </div>
         </div>
       )}
 

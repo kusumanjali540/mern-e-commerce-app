@@ -16,7 +16,7 @@ const AddToCartNotification = () => {
 
   return (
     <div
-      className="absolute top-full left-0 w-full z-50 bg-white shadow-lg bottom-0 transition-all overflow-hidden"
+      className="absolute top-full left-0 md:left-1/2 md:w-1/2 w-full z-50 bg-white shadow-lg bottom-0 transition-all overflow-hidden"
       style={{
         height: isOpen ? "20rem" : "0",
       }}
