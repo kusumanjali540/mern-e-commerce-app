@@ -15,6 +15,7 @@ import { adminReducer } from "./slices/adminSlice";
 import { adminApi } from "./apis/adminApi";
 import { customersApi } from "./apis/customersApi";
 import { ordersApi } from "./apis/ordersApi";
+import { contactApi } from "./apis/contactApi";
 
 const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ const store = configureStore({
     [adminApi.reducerPath]: adminApi.reducer,
     [customersApi.reducerPath]: customersApi.reducer,
     [ordersApi.reducerPath]: ordersApi.reducer,
+    [contactApi.reducerPath]: contactApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware()
@@ -36,7 +38,8 @@ const store = configureStore({
       .concat(reviewsApi.middleware)
       .concat(adminApi.middleware)
       .concat(ordersApi.middleware)
-      .concat(customersApi.middleware);
+      .concat(customersApi.middleware)
+      .concat(contactApi.middleware);
   },
 });
 
@@ -54,6 +57,7 @@ export {
 export { useUploadFileMutation } from "./apis/testApi";
 export { usePostReviewMutation } from "./apis/reviewsApi";
 export { useSignInMutation, useSignUpMutation } from "./apis/adminApi";
+export { useSubmitContactFormMutation } from "./apis/contactApi";
 export {
   useFetchProductsQuery,
   useFetchProductQuery,

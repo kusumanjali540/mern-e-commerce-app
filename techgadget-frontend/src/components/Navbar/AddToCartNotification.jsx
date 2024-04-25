@@ -5,6 +5,7 @@ import { openModal, closeModal, useFetchProductQuery } from "../../features";
 import { Link } from "react-router-dom";
 
 const AddToCartNotification = () => {
+  const cartItemCount = useSelector((state) => state.cart.count);
   const isOpen = useSelector((state) => state.notification.isOpen);
   const addedProduct = useSelector((state) => state.notification.data);
 
@@ -56,7 +57,7 @@ const AddToCartNotification = () => {
             className="w-full h-12 border-2 mb-2"
             onClick={handleCloseModal}
           >
-            View cart (2)
+            View cart ({cartItemCount})
           </button>
         </Link>
 

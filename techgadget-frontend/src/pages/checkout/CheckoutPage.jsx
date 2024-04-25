@@ -31,7 +31,7 @@ const CheckoutPage = () => {
       for (const cartItem of cartItems) {
         try {
           const response = await fetch(
-            `https://mern-e-commerce-app-api.vercel.app/product/${cartItem.productId}`
+            `http://localhost:8080/product/${cartItem.productId}`
           );
           if (!response.ok) {
             throw new Error("Failed to fetch product details");

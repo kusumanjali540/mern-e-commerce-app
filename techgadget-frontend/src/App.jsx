@@ -26,6 +26,7 @@ import AuthLayout from "./layouts/auth/AuthLayout";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import CheckoutSuccess from "./pages/checkout/CheckoutSuccess";
+import Contact from "./pages/Contact";
 
 //Test
 const router = createBrowserRouter(
@@ -38,6 +39,7 @@ const router = createBrowserRouter(
         <Route path="cart" element={<CartPage />} />
 
         <Route path="blogs" element={<Blogs />} />
+        <Route path="contact" element={<Contact />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="refund-policy" element={<RefundPolicy />} />
         <Route path="terms-of-service" element={<TermsOfService />} />

@@ -13,7 +13,7 @@ const Search = ({ setIsOpen, className }) => {
   const [isFocused, setIsFocused] = useState(false);
   const { data, error, isFetching } = useFetchAllProductsQuery();
   const [searchData, setSearchData] = useState([]);
-
+  
   useEffect(() => {
     setSearchData(() => {
       if (data) {

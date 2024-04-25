@@ -9,8 +9,8 @@ const pause = (duration) => {
 const adminApi = createApi({
   reducerPath: "admins",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://mern-e-commerce-app-api.vercel.app/admin",
-    // baseUrl: "http://localhost:8080/admin",
+    // baseUrl: "https://mern-e-commerce-app-api.vercel.app/admin",
+    baseUrl: "http://localhost:8080/admin",
   }),
   endpoints(builder) {
     return {
