@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSubmitContactFormMutation } from "../features";
 import toast from "react-hot-toast";
+import { STORE_EMAIL } from "../utils/constants";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -60,7 +61,7 @@ const Contact = () => {
           30 minutes, or at the latest, within 24 hours.
         </div>
         <div>We look forward to serving you. Here is our email address:</div>
-        <div>info@wirelesstechgadget.com</div>
+        <div>{STORE_EMAIL}</div>
       </div>
       <div className="grid grid-cols-2 gap-x-4">
         <div className="mb-4 col-span-2 md:col-span-1">

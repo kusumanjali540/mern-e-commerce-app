@@ -8,6 +8,7 @@ import {
   useAddCustomerMutation,
   useAddOrderMutation,
   useCreateCheckoutSessionMutation,
+  useLazyFetchProductQuery,
 } from "../../features";
 import toast from "react-hot-toast";
 import { loadStripe } from "@stripe/stripe-js";
@@ -18,32 +19,62 @@ const CheckoutPage = () => {
   const deliveryAddress = useSelector((state) => state.address);
   const [addCustomer, { isLoading, isError }] = useAddCustomerMutation();
   const [addOrder, { isOrderLoading, isOrderError }] = useAddOrderMutation();
-  const [createCheckoutSession, { isCheckoutLoading, isCheckoutError }] = useCreateCheckoutSessionMutation();
+
+  const [createCheckoutSession, { isCheckoutLoading, isCheckoutError }] =
+    useCreateCheckoutSessionMutation();
   const [productArr, setProductArr] = useState([]);
 
   console.log(productArr);
+  const [trigger, result, lastPromiseInfo] = useLazyFetchProductQuery();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
+
+    // const fetchProduct = async () => {
+    //   const items = [];
+    //   for (const cartItem of cartItems) {
+    //     try {
+    //       const response = await fetch(
+    //         `http://localhost:8080/product/${cartItem.productId}`
+    //       );
+    //       if (!response.ok) {
+    //         throw new Error("Failed to fetch product details");
+    //       }
+    //       const data = await response.json();
+    //       items.push({
+    //         product: data.product,
+    //         quantity: cartItem.quantity,
+    //         variant: cartItem.variant,
+    //       });
+    //     } catch (error) {
+    //       toast.error(error.message);
+    //     }
+    //   }
+    //   // Update state with fetched products
+    //   setProductArr(items);
+    // };
+
     const fetchProduct = async () => {
       const items = [];
       for (const cartItem of cartItems) {
         try {
-          const response = await fetch(
-            `http://localhost:8080/product/${cartItem.productId}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch product details");
-          }
-          const data = await response.json();
+          // const response = await fetch(
+          //   `http://localhost:8080/product/${cartItem.productId}`
+          // );
+          await trigger(cartItem.productId);
+
+          console.log(result.data);
           items.push({
-            product: data.product,
+            product: result.data.product,
             quantity: cartItem.quantity,
             variant: cartItem.variant,
           });
-        } catch (error) {
-          toast.error(error.message);
+        } catch (err) {
+          console.log(err);
+          // toast.error(err.data?.message);
+          // err.data.data?.forEach((msg) => {
+          //   toast.error(msg);
+          // });
         }
       }
       // Update state with fetched products
@@ -68,9 +99,7 @@ const CheckoutPage = () => {
     };
 
     try {
-      const stripe = await loadStripe(
-        "pk_test_51P7m8MHoqNfcMTanLbQFlBWXl5FbUMJWMT8J8Onjmw3EXZsfNWJnVt59JnWZXSXWYQXTRG67EwxLtsj3hQBwEwNC00GjaSDMZm"
-      );
+      const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PK_TEST);
 
       const order = {
         products: productArr,
@@ -103,10 +132,10 @@ const CheckoutPage = () => {
       dispatch(resetAddress());
     } catch (err) {
       console.log(err);
-    //   toast.error(err.data.message);
-    //   err.data.data?.forEach((msg) => {
-    //     toast.error(msg);
-    //   });
+      //   toast.error(err.data.message);
+      //   err.data.data?.forEach((msg) => {
+      //     toast.error(msg);
+      //   });
     }
 
     // Verify payment and change payment status

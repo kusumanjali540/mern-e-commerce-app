@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { IoFilterOutline } from "react-icons/io5";
 import ProductCard from "../components/Product/ProductCard";
 import ProductCardSkeleton from "../components/loadingSkeletons/ProductCardSkeleton";
@@ -6,6 +6,7 @@ import { Link, useParams } from "react-router-dom";
 import { useFetchProductsQuery } from "../features";
 
 const Product = () => {
+  const numberOfResultRef = useRef("...");
   const { categoryName } = useParams();
   const [page, setPage] = useState(1);
   const { data, error, isFetching } = useFetchProductsQuery({
@@ -30,7 +31,10 @@ const Product = () => {
         if (categoryName === "all") {
           return true;
         } else {
-          return product.category.name === categoryName;
+          const isMatch = product.categories.find(
+            (category) => category.name === categoryName
+          );
+          return isMatch;
         }
       })
       .map((product, index) => {
@@ -40,6 +44,8 @@ const Product = () => {
           </Link>
         );
       });
+
+    numberOfResultRef.current = content.length;
   }
 
   return (
@@ -53,7 +59,7 @@ const Product = () => {
           <IoFilterOutline />
           Filter and Sort
         </button>
-        <p>{data ? data.totalItems : "..."} products</p>
+        <p>{numberOfResultRef.current} products</p>
       </div>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-4">
         {content}

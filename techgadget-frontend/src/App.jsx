@@ -67,6 +67,7 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
+  console.log(process.env.REACT_APP_STRIPE_PK_TEST);
   return <RouterProvider router={router} />;
 };
 

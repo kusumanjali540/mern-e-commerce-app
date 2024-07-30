@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { ROOT_SERVER_URL } from "../../utils/constants";
 
 const pause = (duration) => {
   return new Promise((resolve) => {
@@ -9,7 +10,7 @@ const pause = (duration) => {
 const contactApi = createApi({
   reducerPath: "contact",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080/contact",
+    baseUrl: `${ROOT_SERVER_URL}/contact`,
     // fetchFn: async (...args) => {
     //   await pause(1000);
     //   return fetch(...args);

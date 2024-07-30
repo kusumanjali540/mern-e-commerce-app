@@ -64,7 +64,8 @@ export {
   useAddProductMutation,
   useRemoveProductMutation,
   useEditProductMutation,
-  useFetchAllProductsQuery
+  useFetchAllProductsQuery,
+  useLazyFetchProductQuery
 } from "./apis/productsApi";
 export {
   useFetchCustomersQuery,

@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { ROOT_SERVER_URL } from "../../utils/constants";
 
 const pause = (duration) => {
   return new Promise((resolve) => {
@@ -9,7 +10,7 @@ const pause = (duration) => {
 const customersApi = createApi({
   reducerPath: "customers",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080/customer",
+    baseUrl: `${ROOT_SERVER_URL}/customer`,
   }),
   endpoints(builder) {
     return {

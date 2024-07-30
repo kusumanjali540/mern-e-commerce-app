@@ -36,10 +36,12 @@ const productSchema = new Schema(
         ref: "Review",
       },
     ],
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-    },
+    categories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
   },
   {
     timestamps: true,

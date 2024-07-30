@@ -1,9 +1,10 @@
 // api.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { ROOT_URL } from "../../utils/constants";
 
 export const testApi = createApi({
   reducerPath: "testApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8080/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: ROOT_URL }),
   endpoints: (builder) => ({
     uploadFile: builder.mutation({
       query: (data) => ({

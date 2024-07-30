@@ -40,11 +40,13 @@ const NavBar = () => {
 
   const handleCatalogClick = (event) => {
     event.preventDefault();
+    setIsOpenCService(false);
     setIsOpenCatalog(!isOpenCatalog);
   };
 
   const handleCServiceClick = (event) => {
     event.preventDefault();
+    setIsOpenCatalog(false);
     setIsOpenCService(!isOpenCService);
   };
 
@@ -110,9 +112,9 @@ const NavBar = () => {
             </button>
             {isOpenCatalog && (
               <div className="absolute flex flex-col justify-center items-start top-full border rounded-sm bg-white w-52 p-4">
-                <NavLink to="/collections/earbuds">Earbuds</NavLink>
-                <NavLink to="/collections/speakers">Speakers</NavLink>
-                <NavLink to="/collections/mouse">Mouse</NavLink>
+                <NavLink to="/products/earbuds" className="hover:underline">Earbuds</NavLink>
+                <NavLink to="/products/speakers" className="hover:underline">Speakers</NavLink>
+                <NavLink to="/products/mouse" className="hover:underline">Mouse</NavLink>
               </div>
             )}
           </NavLink>
@@ -131,8 +133,9 @@ const NavBar = () => {
             </button>
             {isOpenCService && (
               <div className="absolute flex flex-col justify-center items-start top-full border rounded-sm bg-white w-52 p-4">
-                <NavLink to="/catalog">Category 1</NavLink>
-                <NavLink to="/catalog">Category 2</NavLink>
+                <NavLink to="/privacy-policy" className="hover:underline">Privacy Policy</NavLink>
+                <NavLink to="/refund-policy" className="hover:underline">Refund Policy</NavLink>
+                <NavLink to="/terms-of-service" className="hover:underline">Terms Of Service</NavLink>
               </div>
             )}
           </NavLink>

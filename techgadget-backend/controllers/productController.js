@@ -10,6 +10,37 @@ const { validationResult } = require("express-validator");
 const Product = require("../models/product");
 const Category = require("../models/category");
 
+exports.getAllProducts = async (req, res, next) => {
+  try {
+    const totalItems = await Product.find().countDocuments();
+
+    const products = await Product.find().populate("categories");
+
+    // Get imageUrl from s3 bucket
+    await Promise.all(
+      products.map(async (product) => {
+        // Map over each picture in the product
+        product.pictures = await Promise.all(
+          product.pictures.map(async (picture) => {
+            const imageUrl = await getObjectSignedUrl(picture);
+            return imageUrl;
+          })
+        );
+      })
+    );
+
+    res.status(200).json({
+      message: "Fetched product successfully",
+      products: products,
+      totalItems: totalItems,
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
 exports.getProducts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
   const perPage = req.query.perPage || 4;
@@ -17,7 +48,7 @@ exports.getProducts = async (req, res, next) => {
     const totalItems = await Product.find().countDocuments();
 
     const products = await Product.find()
-      .populate("category")
+      .populate("categories")
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
 
@@ -150,7 +181,7 @@ exports.getProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   const errors = validationResult(req);
-  
+
   if (!errors.isEmpty()) {
     const error = new Error("Failed");
     error.statusCode = 422;
@@ -161,8 +192,6 @@ exports.updateProduct = async (req, res, next) => {
   const brand = req.body.brand;
   const description = req.body.description;
   const variants = req.body.variants;
-
-  
 
   const pictures = [];
 
@@ -229,7 +258,7 @@ exports.deleteProduct = async (req, res, next) => {
 
     // clearImage(product.imageUrl);
 
-    await Product.findOneAndDelete({_id: productId});
+    await Product.findOneAndDelete({ _id: productId });
 
     res.status(200).json({ message: "Product deleted successfully." });
   } catch (err) {

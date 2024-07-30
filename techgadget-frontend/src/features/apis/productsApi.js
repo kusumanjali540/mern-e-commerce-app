@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { ROOT_SERVER_URL } from "../../utils/constants";
 
 const pause = (duration) => {
   return new Promise((resolve) => {
@@ -9,15 +10,15 @@ const pause = (duration) => {
 const productsApi = createApi({
   reducerPath: "products",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080/product",
+    baseUrl: `${ROOT_SERVER_URL}/product`,
   }),
   endpoints(builder) {
     return {
       removeProduct: builder.mutation({
-        // invalidatesTags: ["Product"],
-        // invalidatesTags: (result, error, product) => {
-        //   return [{ type: 'Product', id: product.id }];
-        // },
+        invalidatesTags: (result, error, productId) => [
+          { type: "Product", id: productId },
+          { type: "Product", id: "LIST" },
+        ],
         query: (productId) => {
           return {
             url: `/${productId}`,
@@ -26,10 +27,7 @@ const productsApi = createApi({
         },
       }),
       addProduct: builder.mutation({
-        // invalidatesTags: ["Product"],
-        // invalidatesTags: (result, error, user) => {
-        //   return [{ type: 'UsersProducts', id: user.id }];
-        // },
+        invalidatesTags: [{ type: "Product", id: "LIST" }],
         query: (formData) => {
           return {
             url: "/create-product",
@@ -39,14 +37,17 @@ const productsApi = createApi({
         },
       }),
       fetchAllProducts: builder.query({
-        // providesTags: ["Product"],
-        // providesTags: (result, error, user) => {
-        //   const tags = result.map((product) => {
-        //     return { type: 'Product', id: product.id };
-        //   });
-        //   tags.push({ type: 'UsersProducts', id: user.id });
-        //   return tags;
-        // },
+        providesTags: ({ products }) => {
+          // Log the result
+          console.log("Result from fetchProducts:", products);
+
+          return products
+            ? [
+                ...products.map(({ _id }) => ({ type: "Product", id: _id })),
+                { type: "Product", id: "LIST" },
+              ]
+            : [{ type: "Product", id: "LIST" }];
+        },
         query: () => {
           return {
             url: `/all-products`,
@@ -58,14 +59,17 @@ const productsApi = createApi({
         },
       }),
       fetchProducts: builder.query({
-        // providesTags: ["Product"],
-        // providesTags: (result, error, user) => {
-        //   const tags = result.map((product) => {
-        //     return { type: 'Product', id: product.id };
-        //   });
-        //   tags.push({ type: 'UsersProducts', id: user.id });
-        //   return tags;
-        // },
+        providesTags: ({ products }) => {
+          // Log the result
+          console.log("Result from fetchProducts:", products);
+
+          return products
+            ? [
+                ...products.map(({ _id }) => ({ type: "Product", id: _id })),
+                { type: "Product", id: "LIST" },
+              ]
+            : [{ type: "Product", id: "LIST" }];
+        },
         query: ({ page, perPage }) => {
           console.log(page, perPage);
           return {
@@ -78,13 +82,14 @@ const productsApi = createApi({
         },
       }),
       fetchProduct: builder.query({
-        // providesTags: (result, error, user) => {
-        //   const tags = result.map((product) => {
-        //     return { type: 'Product', id: product.id };
-        //   });
-        //   tags.push({ type: 'UsersProducts', id: user.id });
-        //   return tags;
-        // },
+        providesTags: (result, error, id) => {
+          // Log the result, error, and id
+          console.log("Result from fetchProduct:", result);
+          console.log("Error from fetchProduct:", error);
+          console.log("ID from fetchProduct:", id);
+
+          return [{ type: "Product", id }];
+        },
         query: (id) => {
           return {
             url: `/${id}`,
@@ -96,10 +101,9 @@ const productsApi = createApi({
         },
       }),
       editProduct: builder.mutation({
-        // invalidatesTags: ["Product"],
-        // invalidatesTags: (result, error, user) => {
-        //   return [{ type: 'UsersProducts', id: user.id }];
-        // },
+        invalidatesTags: (result, error, { productId }) => [
+          { type: "Product", id: productId },
+        ],
         query: ({ formData, productId }) => {
           console.log(formData, productId);
 
@@ -120,6 +124,7 @@ export const {
   useAddProductMutation,
   useRemoveProductMutation,
   useEditProductMutation,
-  useFetchAllProductsQuery
+  useFetchAllProductsQuery,
+  useLazyFetchProductQuery,
 } = productsApi;
 export { productsApi };
