@@ -5,17 +5,9 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const fs = require("fs");
-const {
-  uploadFile,
-  deleteFile,
-  getObjectSignedUrl,
-} = require("./utils/s3FileUpload");
 
 const dotenv = require("dotenv");
 dotenv.config();
-
-const graphqlSchema = require("./graphql/schema/schema");
-const graphqlResolver = require("./graphql/resolvers/resolvers");
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -94,15 +86,6 @@ app.use((error, req, res, next) => {
   });
   res.status(status).json({ message: message, data: data });
 });
-
-app.use(
-  "/graphql",
-  graphqlHTTP({
-    schema: graphqlSchema,
-    rootValue: graphqlResolver,
-    graphiql: true,
-  })
-);
 
 mongoose
   .connect(process.env.MONGODB_CONNECT)
