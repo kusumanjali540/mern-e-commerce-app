@@ -1,5 +1,4 @@
 const express = require("express");
-const isAuth = require("../middleware/is-auth");
 const multer = require("multer");
 const { body } = require("express-validator");
 
@@ -7,6 +6,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const productController = require("../controllers/productController");
+const validateRequest = require("../middleware/validate-request");
+const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 exports.router = router;
@@ -24,14 +25,17 @@ router.post(
     body("variants").isArray({ min: 1 }).withMessage("Variants are required"),
     body("category").notEmpty().withMessage("Category is required"),
   ],
+  validateRequest,
+  isAuth,
   productController.createProduct
 );
 router.put(
   "/:productId",
   upload.array("pictures"),
+  isAuth,
   productController.updateProduct
 );
-router.delete("/:productId", productController.deleteProduct);
+router.delete("/:productId", isAuth, productController.deleteProduct);
 // router.post(
 //   "/post",
 //   isAuth,

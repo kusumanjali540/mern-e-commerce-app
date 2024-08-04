@@ -5,8 +5,9 @@ import {
   closeModal,
 } from "./slices/notificationSlice";
 import { updateAddress, resetAddress, addressReducer } from "./slices/addressSlice";
+import { changeVariant, selectedVariantReducer } from "./slices/selectedVariantSlice";
 import { addNewCartItem, deleteCartItem } from "./slices/cartSlice";
-import { clearAuthStorage, setAuthState } from "./slices/adminSlice";
+import { login, logout } from "./slices/adminSlice";
 import { testApi } from "./apis/testApi";
 import { productsApi } from "./apis/productsApi";
 import { reviewsApi } from "./apis/reviewsApi";
@@ -23,6 +24,7 @@ const store = configureStore({
     cart: cartReducer,
     admin: adminReducer,
     address: addressReducer,
+    selectedVariant: selectedVariantReducer,
     [testApi.reducerPath]: testApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
     [reviewsApi.reducerPath]: reviewsApi.reducer,
@@ -47,16 +49,16 @@ export {
   store,
   openModal,
   closeModal,
+  changeVariant,
   addNewCartItem,
   deleteCartItem,
-  clearAuthStorage,
-  setAuthState,
+  login, logout,
   updateAddress,
   resetAddress
 };
 export { useUploadFileMutation } from "./apis/testApi";
 export { usePostReviewMutation } from "./apis/reviewsApi";
-export { useSignInMutation, useSignUpMutation } from "./apis/adminApi";
+export { useSignInMutation, useSignUpMutation, useSignOutMutation, useCurrentAdminQuery } from "./apis/adminApi";
 export { useSubmitContactFormMutation } from "./apis/contactApi";
 export {
   useFetchProductsQuery,

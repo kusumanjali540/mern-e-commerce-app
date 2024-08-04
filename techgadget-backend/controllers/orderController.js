@@ -3,6 +3,8 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.getOrders = async (req, res, next) => {
   try {
+    //Fetch orders
+    
     return res
       .status(200)
       .send({ message: "Get orders succesfully!", orders: orders });

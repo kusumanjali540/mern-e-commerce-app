@@ -10,6 +10,22 @@ const { validationResult } = require("express-validator");
 const Product = require("../models/product");
 const Category = require("../models/category");
 
+const fetchProductsWithImages = async (products) => {
+  // Get imageUrl from s3 bucket
+  await Promise.all(
+    products.map(async (product) => {
+      // Map over each picture in the product
+      product.pictures = await Promise.all(
+        product.pictures.map(async (picture) => {
+          const imageUrl = await getObjectSignedUrl(picture);
+          return imageUrl;
+        })
+      );
+    })
+  );
+  return products;
+};
+
 exports.getAllProducts = async (req, res, next) => {
   try {
     const totalItems = await Product.find().countDocuments();
@@ -17,17 +33,7 @@ exports.getAllProducts = async (req, res, next) => {
     const products = await Product.find().populate("categories");
 
     // Get imageUrl from s3 bucket
-    await Promise.all(
-      products.map(async (product) => {
-        // Map over each picture in the product
-        product.pictures = await Promise.all(
-          product.pictures.map(async (picture) => {
-            const imageUrl = await getObjectSignedUrl(picture);
-            return imageUrl;
-          })
-        );
-      })
-    );
+    await fetchProductsWithImages(products);
 
     res.status(200).json({
       message: "Fetched product successfully",
@@ -42,28 +48,54 @@ exports.getAllProducts = async (req, res, next) => {
   }
 };
 exports.getProducts = async (req, res, next) => {
+  const category = req.query.category || "all";
   const currentPage = req.query.page || 1;
   const perPage = req.query.perPage || 4;
+  console.log(category);
   try {
-    const totalItems = await Product.find().countDocuments();
+    let products;
+    let totalItems;
 
-    const products = await Product.find()
-      .populate("categories")
-      .skip((currentPage - 1) * perPage)
-      .limit(perPage);
+    if (category === "all") { // Fetch all products if the category is all
+      products = await Product.find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+
+      totalItems = await Product.find().countDocuments();
+
+      await fetchProductsWithImages(products);
+
+      return res.status(200).json({
+        message: "Fetched product successfully",
+        products: products,
+        totalItems: totalItems,
+      });
+    }
+
+    const fetchedCategory = await Category.findOne({
+      name: category,
+    }).populate("products");
+
+    if (!fetchedCategory) {
+      const error = new Error("No such category is in the system.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    products = [...fetchedCategory.products];
+
+    totalItems = products.length;
+
+    console.log(totalItems);
+
+    // Apply pagination
+    products = products.slice(
+      (currentPage - 1) * perPage,
+      currentPage * perPage
+    );
 
     // Get imageUrl from s3 bucket
-    await Promise.all(
-      products.map(async (product) => {
-        // Map over each picture in the product
-        product.pictures = await Promise.all(
-          product.pictures.map(async (picture) => {
-            const imageUrl = await getObjectSignedUrl(picture);
-            return imageUrl;
-          })
-        );
-      })
-    );
+    await fetchProductsWithImages(products);
 
     res.status(200).json({
       message: "Fetched product successfully",
@@ -79,15 +111,8 @@ exports.getProducts = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   const error = new Error("Failed");
-  //   error.statusCode = 422;
-  //   throw error;
-  // }
-
-  console.log(req.body);
-  console.log(req.files);
+  // console.log(req.body);
+  // console.log(req.files);
 
   if (!req.files) {
     const error = new Error("No image provided.");
@@ -102,7 +127,9 @@ exports.createProduct = async (req, res, next) => {
   console.log(newVariants);
 
   try {
-    const fetchedCategory = Category.findOne({ name: category });
+    const fetchedCategory = await Category.findOne({ name: category });
+
+    console.log(fetchedCategory);
 
     if (!fetchedCategory) {
       const error = new Error(
@@ -124,10 +151,14 @@ exports.createProduct = async (req, res, next) => {
       description,
       variants: newVariants,
       pictures,
-      category: fetchedCategory._id,
+      categories: [fetchedCategory._id],
     });
 
-    await newProduct.save();
+    const returnedNewProduct = await newProduct.save();
+
+    fetchedCategory.products.push(returnedNewProduct._id);
+
+    await fetchedCategory.save();
     // await user.save();
     // io.getIO().emit("products", {
     //   action: "create",
@@ -180,14 +211,6 @@ exports.getProduct = async (req, res, next) => {
 };
 
 exports.updateProduct = async (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    const error = new Error("Failed");
-    error.statusCode = 422;
-    throw error;
-  }
-
   const name = req.body.name;
   const brand = req.body.brand;
   const description = req.body.description;

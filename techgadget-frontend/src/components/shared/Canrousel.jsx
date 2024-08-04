@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { AiOutlineRight } from "react-icons/ai";
 import { AiOutlineLeft } from "react-icons/ai";
+import ResponsiveSquare from "./ResponsiveSquare";
 
 const Canrousel = ({ slides, className }) => {
   const [current, setCurrent] = useState(0);
-  
+
   const previousSlide = () => {
     if (current === 0) {
       setCurrent(slides.length - 1);
@@ -20,13 +21,13 @@ const Canrousel = ({ slides, className }) => {
     <div className={`slider flex flex-col ${className}`}>
       <div className="w-full h-full overflow-hidden relative">
         <div
-          className="flex transition-all"
+          className="w-full flex transition-all"
           style={{
             transform: `translateX(-${current * 100}%)`,
           }}
         >
           {slides.map((pic, index) => (
-            <img key={index} src={pic} alt="pictures" className="object-cover" />
+            <img key={index} src={pic} alt="pictures" className="object-contain" />
           ))}
         </div>
       </div>

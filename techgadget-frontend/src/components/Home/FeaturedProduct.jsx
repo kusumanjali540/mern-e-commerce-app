@@ -6,6 +6,7 @@ import ProductCard from "../Product/ProductCard";
 
 const FeaturedProduct = () => {
   const { data, error, isFetching } = useFetchProductsQuery({
+    category: 'all',
     page: 1,
     perPage: 4,
   });

@@ -35,7 +35,6 @@ exports.getReviews = async (req, res, next) => {
 };
 
 exports.postReview = async (req, res, next) => {
-  console.log(req.body);
   let imageName = null;
 
   if (req.file) {

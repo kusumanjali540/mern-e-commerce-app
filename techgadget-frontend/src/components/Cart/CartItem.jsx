@@ -6,6 +6,7 @@ import CartItemSkeleton from "../loadingSkeletons/CartItemSkeleton";
 import { updateQuantityInCart } from "../../services/useLocalStorageService";
 import { deleteCartItem } from "../../features/slices/cartSlice";
 import { useDispatch } from "react-redux";
+import ResponsiveSquare from "../shared/ResponsiveSquare";
 
 const CartItem = ({ cartItem }) => {
   const dispatch = useDispatch();
@@ -46,10 +47,15 @@ const CartItem = ({ cartItem }) => {
       <tr className="w-full h-full">
         <td className="w-1/4 h-fit md:w-1/6 lg:w-[12%] 2xl:w-1/12">
           <div className="min-w-28 min-h-28 md:w-full">
-            <img
+            {/* <img
               src={data.product.pictures[0]}
               alt={data.product.name}
               className="object-cover"
+            /> */}
+            <ResponsiveSquare
+              src={data.product.pictures[0]}
+              alt={data.product.name}
+              width="100%"
             />
           </div>
         </td>

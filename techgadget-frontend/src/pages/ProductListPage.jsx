@@ -10,6 +10,7 @@ const Product = () => {
   const { categoryName } = useParams();
   const [page, setPage] = useState(1);
   const { data, error, isFetching } = useFetchProductsQuery({
+    category: categoryName,
     page: page || 1,
     perPage: 4,
   });
@@ -26,26 +27,15 @@ const Product = () => {
   } else {
     console.log(data);
     console.log(categoryName);
-    content = data.products
-      .filter((product) => {
-        if (categoryName === "all") {
-          return true;
-        } else {
-          const isMatch = product.categories.find(
-            (category) => category.name === categoryName
-          );
-          return isMatch;
-        }
-      })
-      .map((product, index) => {
-        return (
-          <Link key={index} to={`/product/${product._id}`}>
-            <ProductCard product={product} />
-          </Link>
-        );
-      });
+    content = data.products.map((product, index) => {
+      return (
+        <Link key={index} to={`/product/${product._id}`}>
+          <ProductCard product={product} />
+        </Link>
+      );
+    });
 
-    numberOfResultRef.current = content.length;
+    numberOfResultRef.current = data.totalItems;
   }
 
   return (

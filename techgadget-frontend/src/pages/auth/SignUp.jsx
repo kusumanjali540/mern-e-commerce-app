@@ -7,7 +7,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secretCode, setSecretCode] = useState("");
-  const [signIn, { isLoading, isError }] = useSignUpMutation();
+  const [signUp, { isLoading, isError }] = useSignUpMutation();
 
   const navigate = useNavigate();
 
@@ -24,13 +24,12 @@ const SignUp = () => {
     );
 
     try {
-      const resultAction = await signIn({
+      await signUp({
         email,
         password,
         secretcode: secretCode,
       });
 
-      console.log(resultAction);
     } catch (err) {
       console.log("Error", err);
     }

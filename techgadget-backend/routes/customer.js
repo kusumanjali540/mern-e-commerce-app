@@ -2,11 +2,13 @@ const express = require("express");
 const customerController = require("../controllers/customerController");
 const { body } = require("express-validator");
 const Customer = require("../models/customer");
+const validateRequest= require("../middleware/validate-request");
+const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 
-router.get("/customers", customerController.getCustomers);
-router.get("/:customerId", customerController.getCustomer);
+router.get("/customers", isAuth, customerController.getCustomers);
+router.get("/:customerId", isAuth, customerController.getCustomer);
 router.post(
   "/create-customer",
   [
@@ -38,9 +40,11 @@ router.post(
       })
       .optional(),
   ],
+  validateRequest,
+  isAuth,
   customerController.postCustomer
 );
-router.delete("/:customerId", customerController.deleteCustomer);
-router.put("/:customerId", customerController.updateCustomer);
+router.delete("/:customerId", isAuth, customerController.deleteCustomer);
+router.put("/:customerId", isAuth, customerController.updateCustomer);
 
 module.exports = router;

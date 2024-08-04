@@ -27,6 +27,8 @@ import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import CheckoutSuccess from "./pages/checkout/CheckoutSuccess";
 import Contact from "./pages/Contact";
+import ScrollToTop from "./components/ScrollToTop";
+import ProtectedRouteAdmin from "./components/admin/ProtectedRouteAdmin";
 
 //Test
 const router = createBrowserRouter(
@@ -40,9 +42,18 @@ const router = createBrowserRouter(
 
         <Route path="blogs" element={<Blogs />} />
         <Route path="contact" element={<Contact />} />
-        <Route path="privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="refund-policy" element={<RefundPolicy />} />
-        <Route path="terms-of-service" element={<TermsOfService />} />
+        <Route
+          path="customer-service/privacy-policy"
+          element={<PrivacyPolicy />}
+        />
+        <Route
+          path="customer-service/refund-policy"
+          element={<RefundPolicy />}
+        />
+        <Route
+          path="customer-service/terms-of-service"
+          element={<TermsOfService />}
+        />
         <Route path="test" element={<Test />} />
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="checkout_success" element={<CheckoutSuccess />} />
@@ -54,7 +65,14 @@ const router = createBrowserRouter(
         <Route path="signup" element={<SignUp />} />
       </Route>
 
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRouteAdmin>
+            <AdminLayout />
+          </ProtectedRouteAdmin>
+        }
+      >
         <Route index element={<ProductsManagement />} />
         <Route path="customers-management" element={<CustomersManagement />} />
         {/* <Route path="carts-management" element={<CartsManagement />} /> */}
@@ -68,7 +86,13 @@ const router = createBrowserRouter(
 
 const App = () => {
   console.log(process.env.REACT_APP_STRIPE_PK_TEST);
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router}>
+        <ScrollToTop />
+      </RouterProvider>
+    </>
+  );
 };
 
 export default App;

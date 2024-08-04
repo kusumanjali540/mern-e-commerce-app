@@ -15,6 +15,21 @@ const adminApi = createApi({
   }),
   endpoints(builder) {
     return {
+      currentAdmin: builder.query({
+        // providesTags: (result, error, user) => {
+        //   const tags = result.map((admin) => {
+        //     return { type: 'Product', id: admin.id };
+        //   });
+        //   tags.push({ type: 'UsersProducts', id: user.id });
+        //   return tags;
+        // },
+        query: () => {
+          return {
+            url: `/current-admin`,
+            method: "GET",
+          };
+        },
+      }),
       signUp: builder.mutation({
         // invalidatesTags: (result, error, user) => {
         //   return [{ type: 'UsersProducts', id: user.id }];
@@ -50,12 +65,29 @@ const adminApi = createApi({
           };
         },
       }),
+      signOut: builder.mutation({
+        // providesTags: (result, error, user) => {
+        //   const tags = result.map((admin) => {
+        //     return { type: 'Product', id: admin.id };
+        //   });
+        //   tags.push({ type: 'UsersProducts', id: user.id });
+        //   return tags;
+        // },
+        query: (formData) => {
+          return {
+            url: `/signout`,
+            method: "POST",
+          };
+        },
+      }),
     };
   },
 });
 
 export const {
   useSignUpMutation,
-  useSignInMutation
+  useSignInMutation,
+  useSignOutMutation,
+  useCurrentAdminQuery
 } = adminApi;
 export { adminApi };

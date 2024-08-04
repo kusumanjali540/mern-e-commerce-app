@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
+import ResponsiveSquare from "../shared/ResponsiveSquare";
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -29,11 +30,20 @@ const ProductCard = ({ product }) => {
           height: isLoaded ? "auto" : "10rem",
         }}
       >
-        <img
+        {/* <img
           src={product.pictures[0]}
           alt={product.name}
           onLoad={handleOnLoadImg}
           className={`w-full object-contain transition-opacity duration-300 ${
+            isHovered ? "opacity-60" : ""
+          }`}
+        /> */}
+        <ResponsiveSquare
+          src={product.pictures[0]}
+          alt={product.name}
+          onLoad={handleOnLoadImg}
+          width="100%"
+          className={`transition-opacity duration-300 ${
             isHovered ? "opacity-60" : ""
           }`}
         />

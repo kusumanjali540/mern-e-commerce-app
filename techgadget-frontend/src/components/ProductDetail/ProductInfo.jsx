@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Canrousel from "../shared/Canrousel";
 import Quantity from "../shared/Quantity";
-import { useDispatch } from "react-redux";
-import { addNewCartItem, closeModal, openModal } from "../../features";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  changeVariant,
+  addNewCartItem,
+  closeModal,
+  openModal,
+} from "../../features";
 import Variant from "./Variant";
 import TailSpin from "react-loading-icons/dist/esm/components/tail-spin";
 import { findVariantByProperties } from "../../services/helper";
@@ -12,27 +17,24 @@ import ProductDescription from "./ProductDescription";
 const ProductInfo = ({ product, error, isFetching }) => {
   const dispatch = useDispatch();
 
-  const [selectedVariant, setSelectedVariant] = useState({
-    properties: {},
-    price: null,
-    storage: 1,
-    index: -1,
-  });
+  const selectedVariant = useSelector((state) => state.selectedVariant);
 
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (!isFetching) {
-      setSelectedVariant({
-        ...selectedVariant,
-        properties: {
-          ...selectedVariant.properties,
-          ...product.variants[0].properties,
-        },
-        price: product.variants[0].price,
-        storage: product.variants[0].quantity,
-        index: 0,
-      });
+      dispatch(
+        changeVariant({
+          ...selectedVariant,
+          properties: {
+            ...selectedVariant.properties,
+            ...product.variants[0].properties,
+          },
+          price: product.variants[0].price,
+          storage: product.variants[0].quantity,
+          index: 0,
+        })
+      );
     }
   }, [isFetching, product]);
 
@@ -72,31 +74,37 @@ const ProductInfo = ({ product, error, isFetching }) => {
   };
 
   const handleVariantChange = (value) => {
+    // Find the variant of the product matching with the selected variant
     const { foundVariant, index } = findVariantByProperties(
       product.variants,
       value
     );
 
+    // No variant matched, mark it as out of stock
     if (!foundVariant) {
-      setSelectedVariant({
-        ...selectedVariant,
-        properties: {
-          ...value,
-        },
-        price: null,
-        storage: 0,
-        index: -1,
-      });
-    } else {
-      setSelectedVariant({
-        ...selectedVariant,
-        properties: {
-          ...value,
-        },
-        price: foundVariant.price,
-        storage: foundVariant.quantity,
-        index: index,
-      });
+      dispatch(
+        changeVariant({
+          ...selectedVariant,
+          properties: {
+            ...value,
+          },
+          price: null,
+          storage: 0,
+          index: -1,
+        })
+      );
+    } else { // Update the atributes of selected variant of the product
+      dispatch(
+        changeVariant({
+          ...selectedVariant,
+          properties: {
+            ...value,
+          },
+          price: foundVariant.price,
+          storage: foundVariant.quantity,
+          index: index,
+        })
+      );
     }
   };
 
@@ -153,18 +161,29 @@ const ProductInfo = ({ product, error, isFetching }) => {
                 quantity={quantity}
                 handleDecreaseQuantity={handleDecreaseQuantity}
                 handleIncreaseQuantity={handleIncreaseQuantity}
+                disabled={selectedVariant.storage === 0 ? true : false}
               />
             </div>
 
             <button
-              className="w-full h-14 bg-white border border-black hover:border-4 mb-2"
+              className={`w-full h-14 mb-2 border ${
+                selectedVariant.storage === 0
+                  ? "bg-gray-300 border-gray-300 cursor-not-allowed"
+                  : "bg-white border-black hover:border-4"
+              }`}
               onClick={handleAddToCart}
+              disabled={selectedVariant.storage === 0}
             >
               Add to cart
             </button>
             <button
-              className="w-full h-14 bg-black text-white hover:bg-slate-600 mb-2"
+              className={`w-full h-14 mb-2 text-white ${
+                selectedVariant.storage === 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-black hover:bg-slate-600"
+              }`}
               onClick={() => console.log("Buy Now clicked")}
+              disabled={selectedVariant.storage === 0}
             >
               Buy it now
             </button>

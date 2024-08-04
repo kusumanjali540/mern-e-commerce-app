@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const fs = require("fs");
+const cookieSession = require('cookie-session');
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -18,6 +19,7 @@ const categoryRoutes = require("./routes/category");
 const orderRoutes = require("./routes/order");
 const adminRoutes = require("./routes/admin");
 const contactRoutes = require("./routes/contact");
+const currentAdmin = require("./middleware/current-admin");
 
 const app = express();
 
@@ -57,9 +59,25 @@ app.use(bodyParser.json());
 // app.use(multer({ storage: storage, fileFilter: fileFilter }).single("image"));
 // app.use("/images", express.static(path.join(__dirname, "images")));
 
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: ['somesecretkey'], // Use a strong secret key
+
+    // Cookie options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  })
+);
+
 //CORS
+const allowedOrigins = ['http://localhost:3000', 'https://mern-e-commerce-app-api.vercel.app'];
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PATCH, PUT, DELETE"
@@ -67,6 +85,8 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+
+app.use(currentAdmin);
 
 // Routes
 app.use("/product", productRoutes);

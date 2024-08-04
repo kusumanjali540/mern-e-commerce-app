@@ -59,21 +59,21 @@ const productsApi = createApi({
         },
       }),
       fetchProducts: builder.query({
-        providesTags: ({ products }) => {
-          // Log the result
-          console.log("Result from fetchProducts:", products);
+        // providesTags: ({ products }) => {
+        //   // Log the result
+        //   console.log("Result from fetchProducts:", products);
 
-          return products
-            ? [
-                ...products.map(({ _id }) => ({ type: "Product", id: _id })),
-                { type: "Product", id: "LIST" },
-              ]
-            : [{ type: "Product", id: "LIST" }];
-        },
-        query: ({ page, perPage }) => {
+        //   return products
+        //     ? [
+        //         ...products.map(({ _id }) => ({ type: "Product", id: _id })),
+        //         { type: "Product", id: "LIST" },
+        //       ]
+        //     : [{ type: "Product", id: "LIST" }];
+        // },
+        query: ({ category, page, perPage }) => {
           console.log(page, perPage);
           return {
-            url: `/products?page=${page}&per_page=${perPage || 2}`,
+            url: `/products?category=${category}&page=${page}&per_page=${perPage || 2}`,
             method: "GET",
             headers: {
               "Content-Type": "application/json",

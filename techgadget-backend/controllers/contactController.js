@@ -5,14 +5,6 @@ dotenv.config();
 
 // Route to handle form submission
 exports.submitContactForm = async (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    const error = new Error("Failed");
-    error.statusCode = 422;
-    throw error;
-  }
-
   const { name, email, phone, comment } = req.body;
 
   try {

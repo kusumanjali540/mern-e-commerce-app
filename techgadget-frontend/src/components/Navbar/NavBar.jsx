@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HambuderButton from "../shared/HamburgerButton";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   AiOutlineArrowLeft,
   AiOutlineArrowRight,
@@ -28,6 +28,7 @@ import { useSelector } from "react-redux";
 // Modal.setAppElement('#root');
 
 const NavBar = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenCatalog, setIsOpenCatalog] = useState(false);
   const [isOpenCService, setIsOpenCService] = useState(false);
@@ -98,7 +99,7 @@ const NavBar = () => {
             Home
           </NavLink>
           <NavLink
-            to="collections"
+            to="products"
             className={({ isActive }) =>
               [isActive ? "text-black" : "text-slate-600", "relative"].join(" ")
             }
@@ -133,9 +134,9 @@ const NavBar = () => {
             </button>
             {isOpenCService && (
               <div className="absolute flex flex-col justify-center items-start top-full border rounded-sm bg-white w-52 p-4">
-                <NavLink to="/privacy-policy" className="hover:underline">Privacy Policy</NavLink>
-                <NavLink to="/refund-policy" className="hover:underline">Refund Policy</NavLink>
-                <NavLink to="/terms-of-service" className="hover:underline">Terms Of Service</NavLink>
+                <NavLink to="/customer-service/privacy-policy" className="hover:underline">Privacy Policy</NavLink>
+                <NavLink to="/customer-service/refund-policy" className="hover:underline">Refund Policy</NavLink>
+                <NavLink to="/customer-service/terms-of-service" className="hover:underline">Terms Of Service</NavLink>
               </div>
             )}
           </NavLink>

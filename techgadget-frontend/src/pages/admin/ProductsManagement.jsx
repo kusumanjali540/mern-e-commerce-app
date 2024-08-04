@@ -26,6 +26,7 @@ const ProductsManagement = () => {
   const [page, setPage] = useState(1);
   const [editedProduct, setEditedProduct] = useState();
   const { data, error, isFetching } = useFetchProductsQuery({
+    category: "all",
     page: page,
     perPage: 4,
   });

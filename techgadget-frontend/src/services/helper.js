@@ -1,3 +1,4 @@
+// Find all unique value of properties in a product, in order to initializing the options for choosing variants of the product
 const getUniqueVariants = (variants) => {
   const objToReturn = {};
 
@@ -21,6 +22,7 @@ const getUniqueVariants = (variants) => {
   return objToReturn;
 };
 
+// Get the information of the selected variants in the variants array of the product
 const findVariantByProperties = (variants, properties) => {
   const index = variants.findIndex((variant) => {
     // Find the variant with the properties equal to the provided properties object
@@ -35,7 +37,7 @@ const findVariantByProperties = (variants, properties) => {
     return { foundVariant, index };
   }
 
-  return undefined;
+  return {undefined, index};
 };
 
 const productObject2FormData = (obj) => {

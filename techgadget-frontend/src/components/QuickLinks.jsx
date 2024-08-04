@@ -8,9 +8,9 @@ const QuickLinks = () => {
         <h1 className="text-2xl">Quick links</h1>
         <div className="flex flex-col md:flex-row text-slate-500 gap-4 justify-center items-start gap-x-4">
           <Link to="blogs">Blogs</Link>
-          <Link to="privacy-policy">Privacy Policy</Link>
-          <Link to="refund-policy">Refund Policy</Link>
-          <Link to="terms-of-service">Terms of Service</Link>
+          <Link to="customer-service/privacy-policy">Privacy Policy</Link>
+          <Link to="customer-service/refund-policy">Refund Policy</Link>
+          <Link to="customer-service/terms-of-service">Terms of Service</Link>
         </div>
       </div>
     </div>

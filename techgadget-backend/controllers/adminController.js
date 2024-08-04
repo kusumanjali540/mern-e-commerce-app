@@ -4,78 +4,92 @@ const jwt = require("jsonwebtoken");
 
 const Admin = require("../models/admin");
 
-exports.signup = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error("Validation failed.");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
-  }
-  const email = req.body.email;
-  const password = req.body.password;
-  const secretCode = req.body.secretcode;
+exports.signup = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  if (!secretCode === "somesecretcode") {
-    const error = new Error("Invalid secret code!");
-    error.statusCode = 500;
-    throw error;
-  }
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      throw new Error("Email in use");
+    }
 
-  bcrypt
-    .hash(password, 12)
-    .then((hashedPw) => {
-      const admin = new Admin({
-        email: email,
-        password: hashedPw,
-      });
-      return admin.save();
-    })
-    .then((result) => {
-      res.status(201).json({ message: "Admin created!", adminId: result._id });
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
+    const hashedPw = await bcrypt.hash(password, 12);
+
+    const admin = new Admin({ email, password: hashedPw });
+    await admin.save();
+
+    // Generate JWT
+    const adminJwt = jwt.sign(
+      {
+        id: admin._id,
+        email: admin.email,
+      },
+      "somesecretkey"
+    );
+
+    // Store it on session object
+    req.session = {
+      jwt: adminJwt,
+    };
+
+    res.status(201).json({ message: "Admin created!", admin: admin });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
-exports.login = (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  let loadedAdmin;
-  Admin.findOne({ email: email })
-    .then((admin) => {
-      if (!admin) {
-        const error = new Error("A admin with this email could not be found.");
-        error.statusCode = 401;
-        throw error;
-      }
-      loadedAdmin = admin;
-      return bcrypt.compare(password, admin.password);
-    })
-    .then((isEqual) => {
-      if (!isEqual) {
-        const error = new Error("Wrong password!");
-        error.statusCode = 401;
-        throw error;
-      }
-      const token = jwt.sign(
-        {
-          email: loadedAdmin.email,
-          adminId: loadedAdmin._id.toString(),
-        },
-        "somesupersecretsecret",
-        { expiresIn: "1h" }
-      );
-      res.status(200).json({ token: token, adminId: loadedAdmin._id.toString() });
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
+exports.signin = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const existingAdmin = await Admin.findOne({ email });
+    if (!existingAdmin) {
+      const error = new Error("Invalid credentials");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const passwordsMatch = await bcrypt.compare(
+      password,
+      existingAdmin.password
+    );
+
+    if (!passwordsMatch) {
+      const error = new Error("Invalid Credentials");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Generate JWT
+    const adminJwt = jwt.sign(
+      {
+        id: existingAdmin.id,
+        email: existingAdmin.email,
+      },
+      "somesecretkey"
+    );
+
+    // Store it on session object
+    req.session = {
+      jwt: adminJwt,
+    };
+
+    res.status(200).send(existingAdmin);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.signout = async (req, res, next) => {
+  req.session = null;
+  res.send({});
+};
+
+exports.currentAdmin = (req, res, next) => {
+  res.send({ currentAdmin: req.currentAdmin || null });
 };

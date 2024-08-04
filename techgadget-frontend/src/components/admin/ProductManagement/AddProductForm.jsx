@@ -52,7 +52,7 @@ const AddProductForm = () => {
     // Reset the form after submission if needed
     try {
       const result = await addProduct(newFormData);
-
+      
       console.log(result);
 
       setFormData({
@@ -98,7 +98,7 @@ const AddProductForm = () => {
     }));
   };
 
-  //Handle submit new property of a variant
+  //Handle add new property of a variant
   const addNewVariantProperty = (data, variantIndex) => {
     const newVariants = [...formData.variants];
     newVariants[variantIndex].properties = {

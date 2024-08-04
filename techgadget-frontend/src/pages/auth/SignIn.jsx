@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { setAuthState, useSignInMutation } from "../../features";
+import { Link, useNavigate } from "react-router-dom";
+import { login, useSignInMutation } from "../../features";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
@@ -17,13 +17,8 @@ const SignIn = () => {
     event.preventDefault();
 
     try {
-      const resultAction = await signIn({ email, password });
+      await signIn({ email, password });
 
-
-      localStorage.setItem("token", resultAction.data.token);
-      localStorage.setItem("adminId", resultAction.data.adminId);
-
-      dispatch(setAuthState());
       navigate("/admin");
     } catch (err) {
       toast.error(err.data.message);

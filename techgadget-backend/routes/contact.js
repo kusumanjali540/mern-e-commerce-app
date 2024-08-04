@@ -2,6 +2,7 @@ const express = require("express");
 const { body } = require("express-validator");
 
 const contactController = require("../controllers/contactController");
+const validateRequest = require("../middleware/validate-request");
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.post(
     body("name").notEmpty().withMessage("Please enter name!"),
     body("comment").notEmpty().withMessage("Comment is required!"),
   ],
+  validateRequest,
   contactController.submitContactForm
 );
 

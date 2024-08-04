@@ -27,15 +27,6 @@ exports.getCustomers = async (req, res, next) => {
 
 exports.postCustomer = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      const error = new Error("Validate failed!");
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
     const formData = req.body;
     console.log(formData);
 

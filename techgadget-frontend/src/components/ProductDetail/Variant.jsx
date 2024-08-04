@@ -31,7 +31,7 @@ const Variant = ({ variants, onVariantChange }) => {
                 ? "bg-gray-500 text-white"
                 : "border border-black"
             }
-            } w-20 h-10 rounded-full`}
+            } min-w-20 min-h-10 px-2 py-2 rounded-full`}
             onClick={() => handleVariantChange(key, attVal)}
           >
             {attVal}
