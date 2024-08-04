@@ -41,7 +41,7 @@ const router = createBrowserRouter(
         <Route path="cart" element={<CartPage />} />
 
         <Route path="blogs" element={<Blogs />} />
-        <Route path="contact" element={<Contact />} />
+        <Route path="customer-service/contact" element={<Contact />} />
         <Route
           path="customer-service/privacy-policy"
           element={<PrivacyPolicy />}
@@ -85,7 +85,6 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-  console.log(process.env.REACT_APP_STRIPE_PK_TEST);
   return (
     <>
       <RouterProvider router={router}>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HambuderButton from "../shared/HamburgerButton";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   AiOutlineArrowLeft,
   AiOutlineArrowRight,
@@ -28,12 +28,16 @@ import { useSelector } from "react-redux";
 // Modal.setAppElement('#root');
 
 const NavBar = () => {
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenCatalog, setIsOpenCatalog] = useState(false);
   const [isOpenCService, setIsOpenCService] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const cartCount = useSelector(state => state.cart.count);
+  const location = useLocation();
+
+  useEffect(() => {
+    handleCloseNav();
+  }, [location]);
 
   const toggleNav = () => {
     setIsOpen(!isOpen);
@@ -52,7 +56,7 @@ const NavBar = () => {
   };
 
   const handleCloseNav = () => {
-    toggleNav();
+    setIsOpen(false);
     setIsOpenCatalog(false);
     setIsOpenCService(false);
   };
@@ -92,7 +96,7 @@ const NavBar = () => {
             to="/"
             end
             className={({ isActive }) =>
-              [isActive ? "text-black" : "text-slate-600"].join(" ")
+              [isActive ? "text-black text-lg" : "text-slate-600"].join(" ")
             }
             onClick={handleCloseNav}
           >
@@ -101,7 +105,7 @@ const NavBar = () => {
           <NavLink
             to="products"
             className={({ isActive }) =>
-              [isActive ? "text-black" : "text-slate-600", "relative"].join(" ")
+              [isActive ? "text-black text-lg" : "text-slate-600", "relative"].join(" ")
             }
           >
             <button
@@ -122,7 +126,7 @@ const NavBar = () => {
           <NavLink
             to="customer-service"
             className={({ isActive }) =>
-              [isActive ? "text-black" : "text-slate-600", "relative"].join(" ")
+              [isActive ? "text-black text-lg" : "text-slate-600", "relative"].join(" ")
             }
           >
             <button
@@ -137,6 +141,7 @@ const NavBar = () => {
                 <NavLink to="/customer-service/privacy-policy" className="hover:underline">Privacy Policy</NavLink>
                 <NavLink to="/customer-service/refund-policy" className="hover:underline">Refund Policy</NavLink>
                 <NavLink to="/customer-service/terms-of-service" className="hover:underline">Terms Of Service</NavLink>
+                <NavLink to="/customer-service/contact" className="hover:underline">Contact Us</NavLink>
               </div>
             )}
           </NavLink>
@@ -213,24 +218,27 @@ const NavBar = () => {
               <AiOutlineArrowLeft className="mr-4" />
               Catalog
             </button>
-            <Link
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/products/earbuds"
             >
               Earbuds
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/products/mouse"
             >
-              Headphones
-            </Link>
-            <Link
+              Mouse
+            </NavLink>
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/products/speakers"
             >
               Speakers
-            </Link>
+            </NavLink>
           </div>
 
           <div
@@ -245,30 +253,34 @@ const NavBar = () => {
               <AiOutlineArrowLeft className="mr-4" />
               Customer Service
             </button>
-            <Link
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/customer-service/privacy-policy"
             >
-              Contas Us
-            </Link>
-            <Link
+              Privacy Policy
+            </NavLink>
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/customer-service/refund-policy"
             >
-              FAQ
-            </Link>
-            <Link
+              Refund Policy
+            </NavLink>
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/customer-service/terms-of-service"
             >
-              Shipping & Handling
-            </Link>
-            <Link
+              Terms Of Service
+            </NavLink>
+            <NavLink
               className="px-8 pt-4 h-14 hover:bg-slate-600"
               onClick={handleCloseNav}
+              to="/customer-service/contact"
             >
-              Track Your Order
-            </Link>
+              Contact Us
+            </NavLink>
           </div>
         </div>
       </div>
