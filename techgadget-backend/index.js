@@ -34,7 +34,7 @@ app.use(
     signed: false,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     cookie: {
-      sameSite: "None",
+      sameSite: "none",
       secure: true,
     },
   })
