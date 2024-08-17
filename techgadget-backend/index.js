@@ -33,10 +33,8 @@ app.use(
     keys: ["somecookiesecretkey"],
     signed: false,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    cookie: {
-      sameSite: "none",
-      secure: true,
-    },
+    sameSite: "none", // Ensure SameSite is set to 'None' for cross-site cookies
+    secure: true, // Ensure the cookie is only sent over HTTPS
   })
 );
 
