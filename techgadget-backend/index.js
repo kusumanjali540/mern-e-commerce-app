@@ -6,7 +6,7 @@ const multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const fs = require("fs");
 const cookieSession = require("cookie-session");
-const cors = require('cors');
+const cors = require("cors");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -40,8 +40,8 @@ app.use(
     signed: false,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     cookie: {
-      sameSite: "None", // Allow cookies to be sent across origins
-      secure: process.env.NODE_ENV === "production", // Ensure cookies are sent over HTTPS in production
+      sameSite: "None",
+      secure: true,
     },
   })
 );
