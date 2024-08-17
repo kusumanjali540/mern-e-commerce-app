@@ -6,6 +6,7 @@ const multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const fs = require("fs");
 const cookieSession = require("cookie-session");
+const cors = require('cors');
 
 const dotenv = require("dotenv");
 dotenv.config();
