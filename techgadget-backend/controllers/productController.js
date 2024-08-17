@@ -26,6 +26,17 @@ const fetchProductsWithImages = async (products) => {
   return products;
 };
 
+const fetchOneProductWithImages = async (product) => {
+  product.pictures = await Promise.all(
+    product.pictures.map(async (picture) => {
+      const imageUrl = await getObjectSignedUrl(picture);
+      return imageUrl;
+    })
+  );
+
+  return product;
+};
+
 exports.getAllProducts = async (req, res, next) => {
   try {
     const totalItems = await Product.find().countDocuments();
@@ -56,7 +67,8 @@ exports.getProducts = async (req, res, next) => {
     let products;
     let totalItems;
 
-    if (category === "all") { // Fetch all products if the category is all
+    if (category === "all") {
+      // Fetch all products if the category is all
       products = await Product.find()
         .skip((currentPage - 1) * perPage)
         .limit(perPage);
@@ -111,9 +123,6 @@ exports.getProducts = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-  // console.log(req.body);
-  // console.log(req.files);
-
   if (!req.files) {
     const error = new Error("No image provided.");
     error.statusCode = 422;
@@ -141,8 +150,8 @@ exports.createProduct = async (req, res, next) => {
 
     for (const file of req.files) {
       const imageName = randomImageName();
-      pictures.push(imageName);
       await uploadFile(file.buffer, imageName, file.mimetype);
+      pictures.push(imageName);
     }
 
     const newProduct = new Product({
@@ -284,6 +293,93 @@ exports.deleteProduct = async (req, res, next) => {
     await Product.findOneAndDelete({ _id: productId });
 
     res.status(200).json({ message: "Product deleted successfully." });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.getFindByNameProducts = async (req, res, next) => {
+  const searchTerm = req.query.search_term || "";
+  console.log(searchTerm);
+  try {
+    const products = await Product.find({
+      name: { $regex: new RegExp(searchTerm.toLowerCase(), "i") },
+    });
+
+    if (!products) {
+      const error = new Error("No products matched");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    await fetchProductsWithImages(products);
+
+    const totalItems = products.length || 0;
+
+    return res.status(200).json({
+      message: "Fetched product successfully",
+      products: products,
+      totalItems: totalItems,
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.getProductForCartItem = async (req, res, next) => {
+  try {
+    const { productId, variant_properties } = req.query;
+
+    console.log(productId);
+    console.log(variant_properties);
+    // Step 1: Parse the variant_properties string into an object
+    const parsedVariantProperties = JSON.parse(variant_properties);
+
+    // Step 2: Find the product by productId in the database
+    const product = await Product.findById(productId);
+
+    console.log("Product", product);
+
+    if (!product) {
+      throw Error("Product not found!");
+    }
+
+    await fetchOneProductWithImages(product);
+
+    console.log(product.variants);
+    // Step 3: Find the specific variant that matches the variant_properties
+    const selectedVariant = product.variants.find((variant) => {
+      const variantProps = Object.fromEntries(variant.properties); // Convert Map to Object
+      return Object.entries(parsedVariantProperties).every(
+        ([key, value]) => variantProps[key] === value
+      );
+    });
+
+    if (!selectedVariant) {
+      throw Error("Variant not found!");
+    }
+
+    const toObjectProperties = Object.fromEntries(selectedVariant.properties);
+
+    console.log("Product and variant found");
+
+    const responseProduct = product.toObject();
+    delete responseProduct.variants; // Remove the variants field
+
+    // Add the selected variant details
+    responseProduct.properties = toObjectProperties;
+    responseProduct.price = selectedVariant.price;
+    responseProduct.quantity = selectedVariant.quantity;
+
+    console.log("RES", responseProduct);
+
+    res.status(201).json({ product: responseProduct });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

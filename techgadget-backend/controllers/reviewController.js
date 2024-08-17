@@ -7,25 +7,51 @@ const {
 const Product = require("../models/product");
 const Review = require("../models/review");
 
+const fetchReviewsWithImages = async (reviews) => {
+  // Get imageUrl from s3 bucket
+  await Promise.all(
+    reviews.map(async (review) => {
+      // Map over each picture in the review
+      review.pictures = await Promise.all(
+        review.pictures.map(async (picture) => {
+          const imageUrl = await getObjectSignedUrl(picture);
+          return imageUrl;
+        })
+      );
+    })
+  );
+  return reviews;
+};
+
 exports.getReviews = async (req, res, next) => {
   const productId = req.params.productId;
+
+  console.log(productId);
 
   try {
     const product = await Product.findById(productId).populate("reviews");
 
     const reviews = product.reviews;
 
-    console.log(reviews);
+    await fetchReviewsWithImages(reviews);
 
-    for (let review of reviews) {
-      if (review.pictures.length > 0) {
-        review.imageUrl = await getObjectSignedUrl(review.pictures[0]);
-      }
-    }
+    const totalStars = reviews.reduce((acc, review) => acc + review.star, 0);
+    const averageStar = reviews.length > 0 ? totalStars / reviews.length : 0;
 
-    return res
-      .status(200)
-      .send({ message: "Get reviews succesfully!", reviews: reviews });
+    const starCount = reviews.reduce(
+      (acc, review) => {
+        acc[review.star] = (acc[review.star] || 0) + 1;
+        return acc;
+      },
+      { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } // Initialize counts for each star
+    );
+
+    return res.status(200).send({
+      message: "Get reviews succesfully!",
+      reviews: reviews,
+      averageStar: averageStar,
+      starCount: starCount,
+    });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -35,14 +61,14 @@ exports.getReviews = async (req, res, next) => {
 };
 
 exports.postReview = async (req, res, next) => {
-  let imageName = null;
+  console.log(req.body);
+
+  const { title, comment, reviewer, email, star, productId } = req.body;
+  let imageName;
 
   if (req.file) {
     imageName = randomImageName();
   }
-
-  const { title, comment, reviewer, email, star } = req.body;
-  const productId = req.body.productId;
 
   const review = new Review({
     title,
@@ -61,10 +87,17 @@ exports.postReview = async (req, res, next) => {
       await uploadFile(req.file.buffer, imageName, req.file.mimetype);
     }
 
+    // Save the review to db
     await review.save();
 
+    // Push the review to product
     const product = await Product.findById(productId);
-    console.log(product);
+
+    if (!product) {
+      const err = new Error("No product found!");
+      err.statusCode = 404;
+      throw err;
+    }
 
     product.reviews.push(review);
 
@@ -97,7 +130,9 @@ exports.getReview = async (req, res, next) => {
       review.imageUrl = await getObjectSignedUrl(review.pictures[0]);
     }
 
-    res.status(200).json({ message: "Get review successfully!", review: review });
+    res
+      .status(200)
+      .json({ message: "Get review successfully!", review: review });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -125,7 +160,9 @@ exports.updateReview = async (req, res, next) => {
 
     await review.save();
 
-    res.status(200).json({ message: "Review updated successfully", review: review });
+    res
+      .status(200)
+      .json({ message: "Review updated successfully", review: review });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -147,7 +184,9 @@ exports.deleteReview = async (req, res, next) => {
 
     await Review.findByIdAndRemove(reviewId);
 
-    res.status(200).json({ message: "Review deleted successfully", review: review });
+    res
+      .status(200)
+      .json({ message: "Review deleted successfully", review: review });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

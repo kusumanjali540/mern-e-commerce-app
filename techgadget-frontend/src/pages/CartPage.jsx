@@ -1,15 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CartItem from "../components/Cart/CartItem";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshCart } from "../features";
+import { useLazyFetchProductWithSelectedVariantQuery } from "../features/apis/productsApi";
+import { showErrorToast } from "../services/showErrorToast";
 
 const Cart = () => {
-  const cartItems = useSelector((state) => state.cart.items);
-  console.log(cartItems);
+  const [cartItemsWithProducts, setCartItemsWithProducts] = useState([]);
+  const dispatch = useDispatch();
+  const [trigger, { isLoading, isError }] =
+    useLazyFetchProductWithSelectedVariantQuery();
 
-  const renderCartItems = cartItems.map((cartItem, index) => {
-    return <CartItem key={index} cartItem={cartItem} />;
-  });
+  const cartItems = useSelector((state) => state.cart.items);
+
+  useEffect(() => {
+    dispatch(refreshCart());
+  }, [dispatch]);
+
+  console.log("Reload");
+
+  useEffect(() => {
+    // Fetch product data for each cart item and update state
+    const fetchProducts = async () => {
+      try {
+        const updatedCartItems = await Promise.all(
+          cartItems.map(async (item) => {
+            const product = await trigger(item).unwrap();
+            return { ...item, product };
+          })
+        );
+        setCartItemsWithProducts(updatedCartItems);
+      } catch (error) {
+        showErrorToast(error);
+      }
+    };
+
+    if (cartItems.length > 0) {
+      fetchProducts();
+    }
+  }, [cartItems, trigger]);
 
   return (
     <>
@@ -39,7 +69,32 @@ const Cart = () => {
                   <th className="pb-4 text-xs font-normal opacity-85">TOTAL</th>
                 </tr>
               </thead>
-              <tbody>{renderCartItems}</tbody>
+              <tbody>
+                {isError && (
+                  <tr>
+                    <td colSpan="4" className="text-center py-4">
+                      Error has occured!
+                    </td>
+                  </tr>
+                )}
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="4" className="text-center py-4">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : cartItemsWithProducts.length > 0 ? (
+                  cartItemsWithProducts.map((cartItem, index) => (
+                    <CartItem key={index} cartItem={cartItem} />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center py-4">
+                      Trying to get products data...
+                    </td>
+                  </tr>
+                )}
+              </tbody>
             </table>
           </div>
           <div className="flex flex-col justify-center items-end gap-y-2 border-t-2 py-8">
@@ -47,7 +102,14 @@ const Cart = () => {
               Taxes, discounts and shipping calculated at checkout
             </div>
             <Link to="/checkout">
-              <button className="bg-black text-white px-40 py-4">
+              <button
+                className={`bg-black text-white px-40 py-4 ${
+                  cartItemsWithProducts.length === 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                disabled={cartItemsWithProducts.length === 0}
+              >
                 Checkout
               </button>
             </Link>

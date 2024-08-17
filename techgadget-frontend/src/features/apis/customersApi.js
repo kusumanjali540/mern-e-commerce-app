@@ -11,6 +11,7 @@ const customersApi = createApi({
   reducerPath: "customers",
   baseQuery: fetchBaseQuery({
     baseUrl: `${ROOT_SERVER_URL}/customer`,
+    credentials: "include",
   }),
   endpoints(builder) {
     return {
@@ -60,13 +61,6 @@ const customersApi = createApi({
         },
       }),
       fetchCustomer: builder.query({
-        // providesTags: (result, error, customer) => {
-        //   const tags = result.map((customer) => {
-        //     return { type: 'Customer', id: customer.id };
-        //   });
-        //   tags.push({ type: 'CustomersCustomers', id: customer.id });
-        //   return tags;
-        // },
         query: (id) => {
           return {
             url: `/${id}`,
@@ -74,6 +68,15 @@ const customersApi = createApi({
             headers: {
               "Content-Type": "application/json",
             },
+          };
+        },
+      }),
+      fetchCustomerBySession: builder.query({
+        providesTags: ["Customer", "Edit"],
+        query: () => {
+          return {
+            url: `/customer-by-session`,
+            method: "GET",
           };
         },
       }),
@@ -92,6 +95,16 @@ const customersApi = createApi({
           };
         },
       }),
+      editCustomerBySession: builder.mutation({
+        invalidatesTags: ["Customer", "Edit"],
+        query: (formData) => {
+          return {
+            url: `/update-customer-by-session`,
+            method: "PUT",
+            body: formData,
+          };
+        },
+      }),
     };
   },
 });
@@ -99,8 +112,10 @@ const customersApi = createApi({
 export const {
   useFetchCustomersQuery,
   useFetchCustomerQuery,
+  useFetchCustomerBySessionQuery,
   useAddCustomerMutation,
   useRemoveCustomerMutation,
   useEditCustomerMutation,
+  useEditCustomerBySessionMutation,
 } = customersApi;
 export { customersApi };

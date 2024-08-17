@@ -6,6 +6,7 @@ import {
   useRemoveProductMutation,
 } from "../../../features";
 import { productObject2FormData } from "../../../services/helper";
+import { showErrorToast } from "../../../services/showErrorToast";
 
 const EditProductForm = ({ product, onClose }) => {
   const [formData, setFormData] = useState(product);
@@ -49,7 +50,7 @@ const EditProductForm = ({ product, onClose }) => {
       });
       inputFileRef.current.value = null;
     } catch (err) {
-      console.log(err);
+      showErrorToast(err);
     }
   };
 

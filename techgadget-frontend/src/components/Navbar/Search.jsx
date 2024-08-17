@@ -4,27 +4,31 @@ import {
   AiOutlineClose,
   AiOutlineSearch,
 } from "react-icons/ai";
-import { useFetchAllProductsQuery } from "../../features";
+import { useFetchFindByNameProductsQuery } from "../../features";
 import { Link } from "react-router-dom";
 import SearchItem from "./SearchItem";
 
 const Search = ({ setIsOpen, className }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [isFocused, setIsFocused] = useState(false);
-  const { data, error, isFetching } = useFetchAllProductsQuery();
-  const [searchData, setSearchData] = useState([]);
-  
+  const { data, error, isFetching } = useFetchFindByNameProductsQuery(
+    debouncedSearchTerm,
+    {
+      skip: !searchTerm, // Skip if searchTerm is empty
+    }
+  );
+
   useEffect(() => {
-    setSearchData(() => {
-      if (data) {
-        return data.products.filter((product) => {
-          return product.name.toLowerCase().includes(searchTerm.toLowerCase());
-        });
-      } else {
-        return [];
-      }
-    });
-  }, [searchTerm, data]);
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000); // 1 seconds debounce time
+
+    // Clear timeout if searchTerm changes (i.e., user types more characters)
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   const handleCloseSearch = () => {
     setIsOpen(false);
@@ -49,6 +53,7 @@ const Search = ({ setIsOpen, className }) => {
   return (
     <div
       className={`absolute block top-0 left-0 w-full min-h-[18vh] z-[101] transition-all ${className}`}
+      // className={`absolute block top-0 left-0 w-full min-h-[18vh] z-[101] transition-all`}
     >
       <div className="w-full h-[18vh] bg-white flex flex-row justify-center items-center px-4">
         <div
@@ -91,13 +96,25 @@ const Search = ({ setIsOpen, className }) => {
             <div className="px-4">
               <h1>Products</h1>
               <div className="flex flex-col gap-1">
-                {searchData.length > 0
-                  ? searchData.map((item, index) => (
-                      <Link key={index} to={`/product/${item._id}`} onClick={handleCloseSearch}>
-                        <SearchItem item={item} />
-                      </Link>
-                    ))
-                  : "Not found!"}
+                {isFetching ? (
+                  <div className="text-center py-4">Loading...</div>
+                ) : error ? (
+                  <div className="text-center py-4 text-red-500">
+                    Error fetching data
+                  </div>
+                ) : data?.products?.length > 0 ? (
+                  data.products.map((item, index) => (
+                    <Link
+                      key={index}
+                      to={`/product/${item._id}`}
+                      onClick={handleCloseSearch}
+                    >
+                      <SearchItem item={item} />
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-center py-4">Not found!</div>
+                )}
               </div>
             </div>
 

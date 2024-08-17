@@ -11,6 +11,7 @@ const ordersApi = createApi({
   reducerPath: "orders",
   baseQuery: fetchBaseQuery({
     baseUrl: `${ROOT_SERVER_URL}/order`,
+    credentials: "include",
   }),
   endpoints(builder) {
     return {
@@ -59,18 +60,40 @@ const ordersApi = createApi({
           };
         },
       }),
+      fetchOrdersBySession: builder.query({
+        // providesTags: ["Order"],
+        // providesTags: (result, error, order) => {
+        //   const tags = result.map((order) => {
+        //     return { type: 'Order', id: order.id };
+        //   });
+        //   tags.push({ type: 'OrdersOrders', id: order.id });
+        //   return tags;
+        // },
+        query: () => {
+          return {
+            url: `/orders-by-session`,
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+        },
+      }),
       editOrder: builder.mutation({
         // invalidatesTags: ["Order"],
         // invalidatesTags: (result, error, order) => {
         //   return [{ type: 'OrdersOrders', id: order.id }];
         // },
         query: ({ formData, orderId }) => {
-          console.log(formData, orderId);
+          console.log("endpoint", formData, orderId);
 
           return {
             url: `/${orderId}`,
             method: "PUT",
-            body: formData,
+            body: JSON.stringify(formData),
+            headers: {
+              "Content-Type": "application/json",
+            },
           };
         },
       }),
@@ -79,16 +102,18 @@ const ordersApi = createApi({
         // invalidatesTags: (result, error, order) => {
         //   return [{ type: 'OrdersOrders', id: order.id }];
         // },
-        query: (products) => {
-          console.log(products);
+        query: (order) => {
+          console.log(order);
 
           return {
             url: `/create-checkout-session`,
             method: "POST",
-            body: products,
+            body: order,
+            headers: {
+              "Content-Type": "application/json",
+            },
           };
         },
-        
       }),
     };
   },
@@ -96,6 +121,7 @@ const ordersApi = createApi({
 
 export const {
   useFetchOrdersQuery,
+  useFetchOrdersBySessionQuery,
   useFetchOrderQuery,
   useAddOrderMutation,
   useRemoveOrderMutation,

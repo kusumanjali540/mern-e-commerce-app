@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 // Find all unique value of properties in a product, in order to initializing the options for choosing variants of the product
 const getUniqueVariants = (variants) => {
   const objToReturn = {};
@@ -37,7 +39,7 @@ const findVariantByProperties = (variants, properties) => {
     return { foundVariant, index };
   }
 
-  return {undefined, index};
+  return { undefined, index };
 };
 
 const productObject2FormData = (obj) => {
@@ -74,24 +76,7 @@ const productObject2FormData = (obj) => {
 };
 
 const compareTwoObj = (obj1, obj2) => {
-  // Get the keys of both objects
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-
-  // Check if the number of keys is the same
-  if (keys1.length !== keys2.length) {
-    return false;
-  }
-
-  // Check if the values of corresponding keys are equal
-  for (const key of keys1) {
-    if (obj1[key] !== obj2[key]) {
-      return false;
-    }
-  }
-
-  // Objects are equal
-  return true;
+  return _.isEqual(obj1, obj2);
 };
 
 const capitalizeWords = (str) => {
@@ -121,23 +106,24 @@ const calculateTotalPriceOfCartItem = (productDetail) => {
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   var R = 6371; // Radius of the earth in km
-  var dLat = deg2rad(lat2-lat1);  // deg2rad below
-  var dLon = deg2rad(lon2-lon1);
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
   console.log(dLon);
-  var a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-    ;
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   console.log(a);
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  console.log(c); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  console.log(c);
   var d = R * c; // Distance in km
   return d;
 }
 
 function deg2rad(deg) {
-  return deg * (Math.PI/180)
+  return deg * (Math.PI / 180);
 }
 
 // Helper function to calculate the shipping fee based on the distance between two locations
@@ -157,6 +143,12 @@ const calculateShippingFee = (lat1, lon1) => {
   return shippingFee.toFixed(2);
 };
 
+const getTimeFromISODateString = (ISOString) => {
+  const d = new Date(ISOString);
+  return d.getDate() + "-" + parseInt(d.getMonth() + 1) + "-" + d.getFullYear();
+};
+
+
 export {
   productObject2FormData,
   getUniqueVariants,
@@ -165,4 +157,5 @@ export {
   capitalizeWords,
   calculateTotalPriceOfCartItem,
   calculateShippingFee,
+  getTimeFromISODateString,
 };

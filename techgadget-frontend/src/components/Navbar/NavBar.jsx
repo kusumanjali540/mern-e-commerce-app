@@ -6,6 +6,7 @@ import {
   AiOutlineArrowRight,
   AiOutlineDown,
   AiOutlineShopping,
+  AiOutlineUser,
 } from "react-icons/ai";
 import AddToCartNotification from "./AddToCartNotification";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -13,8 +14,9 @@ import { AiOutlineUp } from "react-icons/ai";
 import Logo from "../shared/Logo";
 import HamburgerButton from "../shared/HamburgerButton";
 import Search from "./Search";
-import Modal from 'react-modal';
+import Modal from "react-modal";
 import { useSelector } from "react-redux";
+import DropdownArrowAnimatedIcon from "../shared/DropdownArrowAnimatedIcon";
 
 // const customStyles = {
 //   content: {
@@ -32,7 +34,7 @@ const NavBar = () => {
   const [isOpenCatalog, setIsOpenCatalog] = useState(false);
   const [isOpenCService, setIsOpenCService] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const cartCount = useSelector(state => state.cart.count);
+  const cartCount = useSelector((state) => state.cart.count);
   const location = useLocation();
 
   useEffect(() => {
@@ -68,19 +70,14 @@ const NavBar = () => {
 
   return (
     <div className="flex flex-row sticky top-0 px-10 lg:px-48 justify-between items-center h-[15vh] w-full bg-white border-b-2 z-[100]">
-      <Search setIsOpen={setSearchOpen} className={`${searchOpen ? "block" : "hidden"}`}/>
-      {/* <Modal
-        isOpen={searchOpen}
-        // onAfterOpen={afterOpenModal}
-        // onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Example Modal"
-      >
-        <Search /> 
-      </Modal> */}
+      <Search
+        setIsOpen={setSearchOpen}
+        className={`${searchOpen ? "block" : "hidden"}`}
+      />
+
       <div className="flex-1 lg:hidden">
         <HamburgerButton
-          onChange={handleCloseNav}
+          onChange={toggleNav}
           isOpen={isOpen}
           className="self-start"
         />
@@ -105,7 +102,10 @@ const NavBar = () => {
           <NavLink
             to="products"
             className={({ isActive }) =>
-              [isActive ? "text-black text-lg" : "text-slate-600", "relative"].join(" ")
+              [
+                isActive ? "text-black text-lg" : "text-slate-600",
+                "relative",
+              ].join(" ")
             }
           >
             <button
@@ -113,20 +113,29 @@ const NavBar = () => {
               className="flex flex-row justify-between items-center gap-2"
             >
               Catalog
-              {isOpenCatalog ? <AiOutlineUp /> : <AiOutlineDown />}
+              <DropdownArrowAnimatedIcon isOpen={isOpenCatalog} />
             </button>
             {isOpenCatalog && (
               <div className="absolute flex flex-col justify-center items-start top-full border rounded-sm bg-white w-52 p-4">
-                <NavLink to="/products/earbuds" className="hover:underline">Earbuds</NavLink>
-                <NavLink to="/products/speakers" className="hover:underline">Speakers</NavLink>
-                <NavLink to="/products/mouse" className="hover:underline">Mouse</NavLink>
+                <NavLink to="/products/earbuds" className="hover:underline">
+                  Earbuds
+                </NavLink>
+                <NavLink to="/products/speakers" className="hover:underline">
+                  Speakers
+                </NavLink>
+                <NavLink to="/products/mouse" className="hover:underline">
+                  Mouse
+                </NavLink>
               </div>
             )}
           </NavLink>
           <NavLink
             to="customer-service"
             className={({ isActive }) =>
-              [isActive ? "text-black text-lg" : "text-slate-600", "relative"].join(" ")
+              [
+                isActive ? "text-black text-lg" : "text-slate-600",
+                "relative",
+              ].join(" ")
             }
           >
             <button
@@ -134,14 +143,34 @@ const NavBar = () => {
               className="flex flex-row justify-between items-center gap-2"
             >
               Customer Service
-              {isOpenCService ? <AiOutlineUp /> : <AiOutlineDown />}
+              <DropdownArrowAnimatedIcon isOpen={isOpenCService} />
             </button>
             {isOpenCService && (
               <div className="absolute flex flex-col justify-center items-start top-full border rounded-sm bg-white w-52 p-4">
-                <NavLink to="/customer-service/privacy-policy" className="hover:underline">Privacy Policy</NavLink>
-                <NavLink to="/customer-service/refund-policy" className="hover:underline">Refund Policy</NavLink>
-                <NavLink to="/customer-service/terms-of-service" className="hover:underline">Terms Of Service</NavLink>
-                <NavLink to="/customer-service/contact" className="hover:underline">Contact Us</NavLink>
+                <NavLink
+                  to="/customer-service/privacy-policy"
+                  className="hover:underline"
+                >
+                  Privacy Policy
+                </NavLink>
+                <NavLink
+                  to="/customer-service/refund-policy"
+                  className="hover:underline"
+                >
+                  Refund Policy
+                </NavLink>
+                <NavLink
+                  to="/customer-service/terms-of-service"
+                  className="hover:underline"
+                >
+                  Terms Of Service
+                </NavLink>
+                <NavLink
+                  to="/customer-service/contact"
+                  className="hover:underline"
+                >
+                  Contact Us
+                </NavLink>
               </div>
             )}
           </NavLink>
@@ -159,8 +188,15 @@ const NavBar = () => {
             <Link to="/cart">
               <button className="relative">
                 <AiOutlineShopping className="text-2xl md:text-4xl" />
-                <div className="absolute right-0 bottom-0 rounded-full text-white bg-black text-xs px-1">{cartCount}</div>
+                <div className="absolute right-0 bottom-0 rounded-full text-white bg-black text-xs px-1">
+                  {cartCount}
+                </div>
               </button>
+            </Link>
+          </div>
+          <div>
+            <Link to="/account">
+              <AiOutlineUser className="text-2xl md:text-4xl" />
             </Link>
           </div>
         </div>
@@ -172,7 +208,7 @@ const NavBar = () => {
       >
         <div className="relative h-full border">
           <div className="flex flex-col py-8 h-full">
-            <div className="px-8 pt-4 h-14 hover:bg-slate-600">
+            <div className="px-8 pt-4 h-14 hover:bg-slate-300">
               <NavLink
                 to="/"
                 end
@@ -182,7 +218,7 @@ const NavBar = () => {
                 Home
               </NavLink>
             </div>
-            <div className="px-8 pt-4 h-14 hover:bg-slate-600">
+            <div className="px-8 pt-4 h-14  hover:bg-slate-300">
               <NavLink to="catalog">
                 <button
                   onClick={handleCatalogClick}
@@ -193,7 +229,7 @@ const NavBar = () => {
                 </button>
               </NavLink>
             </div>
-            <div className="px-8 pt-4 h-14 hover:bg-slate-600">
+            <div className="px-8 pt-4 h-14  hover:bg-slate-300">
               <NavLink to="customer-service">
                 <button
                   onClick={handleCServiceClick}
@@ -219,21 +255,21 @@ const NavBar = () => {
               Catalog
             </button>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/products/earbuds"
             >
               Earbuds
             </NavLink>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/products/mouse"
             >
               Mouse
             </NavLink>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/products/speakers"
             >
@@ -254,28 +290,28 @@ const NavBar = () => {
               Customer Service
             </button>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/customer-service/privacy-policy"
             >
               Privacy Policy
             </NavLink>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/customer-service/refund-policy"
             >
               Refund Policy
             </NavLink>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/customer-service/terms-of-service"
             >
               Terms Of Service
             </NavLink>
             <NavLink
-              className="px-8 pt-4 h-14 hover:bg-slate-600"
+              className="px-8 pt-4 h-14  hover:bg-slate-300"
               onClick={handleCloseNav}
               to="/customer-service/contact"
             >

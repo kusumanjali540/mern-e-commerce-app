@@ -7,12 +7,19 @@ const upload = multer({ storage: storage });
 
 const productController = require("../controllers/productController");
 const validateRequest = require("../middleware/validate-request");
-const isAuth = require("../middleware/is-auth");
+const isAuthAdmin = require("../middleware/is-auth-admin");
+const isAuth = require("../middleware/is-auth-admin-or-customer");
 
 const router = express.Router();
 exports.router = router;
 
 router.get("/products", productController.getProducts);
+router.get(
+  "/product-for-cart-item",
+  isAuth,
+  productController.getProductForCartItem
+);
+router.get("/find-by-name-products", productController.getFindByNameProducts);
 router.get("/all-products", productController.getAllProducts);
 router.get("/:productId", productController.getProduct);
 router.post(
@@ -26,16 +33,16 @@ router.post(
     body("category").notEmpty().withMessage("Category is required"),
   ],
   validateRequest,
-  isAuth,
+  isAuthAdmin,
   productController.createProduct
 );
 router.put(
   "/:productId",
   upload.array("pictures"),
-  isAuth,
+  isAuthAdmin,
   productController.updateProduct
 );
-router.delete("/:productId", isAuth, productController.deleteProduct);
+router.delete("/:productId", isAuthAdmin, productController.deleteProduct);
 // router.post(
 //   "/post",
 //   isAuth,

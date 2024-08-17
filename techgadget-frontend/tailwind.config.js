@@ -4,11 +4,9 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        "hero": "url('/public/img/hero.png')",
+        hero: "url('/public/img/hero.png')",
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [require("@tailwindcss/typography")],
 };

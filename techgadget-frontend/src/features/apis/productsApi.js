@@ -11,6 +11,7 @@ const productsApi = createApi({
   reducerPath: "products",
   baseQuery: fetchBaseQuery({
     baseUrl: `${ROOT_SERVER_URL}/product`,
+    credentials: "include",
   }),
   endpoints(builder) {
     return {
@@ -37,13 +38,16 @@ const productsApi = createApi({
         },
       }),
       fetchAllProducts: builder.query({
-        providesTags: ({ products }) => {
+        providesTags: (result) => {
           // Log the result
-          console.log("Result from fetchProducts:", products);
+          console.log("Result from fetchProducts:", result?.products);
 
-          return products
+          return result?.products
             ? [
-                ...products.map(({ _id }) => ({ type: "Product", id: _id })),
+                ...result.products.map(({ _id }) => ({
+                  type: "Product",
+                  id: _id,
+                })),
                 { type: "Product", id: "LIST" },
               ]
             : [{ type: "Product", id: "LIST" }];
@@ -59,21 +63,52 @@ const productsApi = createApi({
         },
       }),
       fetchProducts: builder.query({
-        // providesTags: ({ products }) => {
-        //   // Log the result
-        //   console.log("Result from fetchProducts:", products);
+        providesTags: (result) => {
+          // Log the result
+          console.log("Result from fetchProducts:", result?.products);
 
-        //   return products
-        //     ? [
-        //         ...products.map(({ _id }) => ({ type: "Product", id: _id })),
-        //         { type: "Product", id: "LIST" },
-        //       ]
-        //     : [{ type: "Product", id: "LIST" }];
-        // },
+          return result?.products
+            ? [
+                ...result.products.map(({ _id }) => ({
+                  type: "Product",
+                  id: _id,
+                })),
+                { type: "Product", id: "LIST" },
+              ]
+            : [{ type: "Product", id: "LIST" }];
+        },
         query: ({ category, page, perPage }) => {
           console.log(page, perPage);
           return {
-            url: `/products?category=${category}&page=${page}&per_page=${perPage || 2}`,
+            url: `/products?category=${category}&page=${page}&per_page=${
+              perPage || 2
+            }`,
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+        },
+      }),
+      fetchFindByNameProducts: builder.query({
+        providesTags: (result) => {
+          // Log the result
+          console.log("Result from fetchProducts:", result?.products);
+
+          return result?.products
+            ? [
+                ...result.products.map(({ _id }) => ({
+                  type: "Product",
+                  id: _id,
+                })),
+                { type: "Product", id: "LIST" },
+              ]
+            : [{ type: "Product", id: "LIST" }];
+        },
+        query: (searchTerm) => {
+          console.log(searchTerm);
+          return {
+            url: `/find-by-name-products?search_term=${searchTerm}`,
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -84,16 +119,25 @@ const productsApi = createApi({
       fetchProduct: builder.query({
         providesTags: (result, error, id) => {
           // Log the result, error, and id
-          console.log("Result from fetchProduct:", result);
-          console.log("Error from fetchProduct:", error);
-          console.log("ID from fetchProduct:", id);
-
           return [{ type: "Product", id }];
         },
         query: (id) => {
           return {
             url: `/${id}`,
             method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+        },
+      }),
+      fetchProductWithSelectedVariant: builder.query({
+        query: (cartItem) => {
+          return {
+            url: `/product-for-cart-item?productId=${
+              cartItem.productId
+            }&variant_properties=${JSON.stringify(cartItem.variantProperties)}`,
+            method: "Get",
             headers: {
               "Content-Type": "application/json",
             },
@@ -126,5 +170,8 @@ export const {
   useEditProductMutation,
   useFetchAllProductsQuery,
   useLazyFetchProductQuery,
+  useFetchFindByNameProductsQuery,
+  useFetchProductWithSelectedVariantQuery,
+  useLazyFetchProductWithSelectedVariantQuery,
 } = productsApi;
 export { productsApi };

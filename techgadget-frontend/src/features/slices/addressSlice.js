@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const addressSlice = createSlice({
   name: "address",
   initialState: {
-    emailPhone: "",
+    email: "",
     firstName: "",
     lastName: "",
     address: "",
@@ -11,10 +11,6 @@ const addressSlice = createSlice({
     city: "",
     stateName: "",
     zipcode: "",
-    lat: "",
-    lon: "",
-    isSaveInfo: false,
-    newLetterChecked: false,
   },
   reducers: {
     updateAddress: (state, action) => {
@@ -26,13 +22,9 @@ const addressSlice = createSlice({
         city,
         stateName,
         zipcode,
-        emailPhone,
-        isSaveInfo,
-        newLetterChecked,
-        lat,
-        lon
+        email,
       } = action.payload;
-      state.emailPhone = emailPhone;
+      state.email = email;
       state.country = country;
       state.firstName = firstName;
       state.lastName = lastName;
@@ -40,10 +32,6 @@ const addressSlice = createSlice({
       state.city = city;
       state.stateName = stateName;
       state.zipcode = zipcode;
-      state.isSaveInfo = isSaveInfo;
-      state.newLetterChecked = newLetterChecked;
-      state.lat = lat;
-      state.lon = lon;
     },
     resetAddress: (state) => {
       state.country = "";
@@ -51,13 +39,9 @@ const addressSlice = createSlice({
       state.lastName = "";
       state.address = "";
       state.city = "";
-      state.lat = "";
-      state.lon = "";
       state.stateName = "";
       state.zipcode = "";
-      state.emailPhone = "";
-      state.isSaveInfo = false;
-      state.newLetterChecked = false;
+      state.email = "";
     },
   },
 });

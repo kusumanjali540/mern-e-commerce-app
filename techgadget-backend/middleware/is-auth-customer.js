@@ -1,5 +1,5 @@
-function isAuth (req, res, next) {
-  if (!req.currentAdmin) {
+function isAuthCustomer (req, res, next) {
+  if (!req.currentCustomer) {
     const error = new Error("Not authenticated.");
     error.statusCode = 401;
     throw error;
@@ -8,4 +8,4 @@ function isAuth (req, res, next) {
   next();
 };
 
-module.exports = isAuth;
+module.exports = isAuthCustomer;

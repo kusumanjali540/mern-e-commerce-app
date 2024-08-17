@@ -1,12 +1,14 @@
 import React from "react";
+import { Toaster } from "react-hot-toast";
 import { Outlet } from "react-router-dom";
 
-const AuthLayout = () => {
+const AdminAuthLayout = () => {
   return (
     <div>
+      <Toaster />
       <Outlet />
     </div>
   );
 };
 
-export default AuthLayout;
+export default AdminAuthLayout;

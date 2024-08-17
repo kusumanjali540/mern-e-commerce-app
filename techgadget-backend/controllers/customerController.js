@@ -1,7 +1,135 @@
 const Customer = require("../models/customer");
-const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { saltRounds } = require("../utils/constants");
 
+// Customer Authentication
+exports.signup = async (req, res, next) => {
+  try {
+    const { email, password, firstName, lastName } = req.body;
+
+    console.log(req.body);
+
+    const existingUser = await Customer.findOne({ email });
+    if (existingUser) {
+      throw new Error("Email in use");
+    }
+
+    const hashedPw = await bcrypt.hash(password, saltRounds);
+
+    const customer = new Customer({
+      firstName,
+      lastName,
+      email,
+      password: hashedPw,
+    });
+
+    await customer.save();
+
+    // Generate JWT
+    const customerAuthJwt = jwt.sign(
+      {
+        id: customer._id,
+        email: customer.email,
+        role: "customer",
+      },
+      "somesecretkey"
+    );
+
+    // Store it on session object
+    req.session = {
+      jwt: customerAuthJwt,
+    };
+
+    console.log(req.session);
+
+    res.status(201).json({ message: "User created!", user: customer });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.signin = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const existingUser = await Customer.findOne({ email });
+    if (!existingUser) {
+      const error = new Error("Invalid Credentials");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const passwordsMatch = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (!passwordsMatch) {
+      const error = new Error("Invalid Credentials");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Generate JWT
+    const customerAuthJwt = jwt.sign(
+      {
+        id: existingUser.id,
+        email: existingUser.email,
+        role: "customer",
+      },
+      "somesecretkey"
+    );
+
+    // Store it on session object
+    req.session = {
+      jwt: customerAuthJwt,
+    };
+
+    res.status(200).send(existingUser);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.signout = async (req, res, next) => {
+  req.session = null;
+  res.send({});
+};
+
+exports.currentCustomer = (req, res, next) => {
+  res.send({ currentCustomer: req.currentCustomer || null });
+};
+
+exports.getCustomerBySession = async (req, res, next) => {
+  console.log("I called");
+  try {
+    console.log("Customer", req.currentCustomer);
+    if (!req.currentCustomer) {
+      res.status(200).send({ user: null });
+    }
+
+    const user = await Customer.findById(req.currentCustomer?.id || "");
+    if (!user) {
+      const error = new Error("User's not found!");
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).send({ user: user });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+// CRUD on Customer information
 exports.getCustomers = async (req, res, next) => {
   const currentPage = req.query.page || 1;
   const perPage = req.query.perPage || 4;
@@ -82,7 +210,7 @@ exports.getCustomer = async (req, res, next) => {
 };
 
 exports.updateCustomer = async (req, res, next) => {
-  const customerId = req.params.customerId;
+  const customerId = req.currentCustomer.id;
   const formData = req.body;
 
   try {
@@ -94,15 +222,16 @@ exports.updateCustomer = async (req, res, next) => {
       throw error;
     }
 
-    customer.email = formData.email;
-    customer.password = formData.password;
-    customer.firstName = formData.firstName;
-    customer.lastName = formData.lastName;
-    customer.address = formData.address;
-    customer.city = formData.city;
-    customer.state = formData.state;
-    customer.zipcode = formData.zipcode;
-    customer.status = formData.status;
+    customer.email = formData.email ?? customer.email;
+    customer.password = formData.password ?? customer.password;
+    customer.firstName = formData.firstName ?? customer.firstName;
+    customer.lastName = formData.lastName ?? customer.lastName;
+    customer.address = formData.address ?? customer.address;
+    customer.country = formData.country ?? customer.country;
+    customer.city = formData.city ?? customer.city;
+    customer.state = formData.state ?? customer.state;
+    customer.zipcode = formData.zipcode ?? customer.zipcode;
+    customer.status = formData.status ?? customer.status;
 
     await customer.save();
 

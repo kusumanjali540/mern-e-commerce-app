@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import _ from "lodash";
 import {
   addToCart,
   deleteFromCart,
+  emptyCart,
   getCartItemsWithTimestamps,
 } from "../../services/useLocalStorageService";
 
@@ -12,13 +14,32 @@ const cartSlice = createSlice({
     count: getCartItemsWithTimestamps().length || 0,
   },
   reducers: {
+    refreshCart: (state) => {
+      const initialState = {
+        items: getCartItemsWithTimestamps() || [],
+        count: getCartItemsWithTimestamps().length || 0,
+      };
+      return initialState;
+    },
+    resetCart: (state) => {
+      emptyCart();
+
+      return {
+        items: [],
+        count: 0,
+      };
+    },
     addNewCartItem: (state, action) => {
       const newItem = action.payload;
-      
+
       addToCart(newItem);
 
-      const existingItemIndex = state.items.findIndex(item => item.productId === newItem.productId);
-    
+      const existingItemIndex = state.items.findIndex(
+        (item) =>
+          item.productId === newItem.productId &&
+          _.isEqual(item.variantProperties, newItem.variantProperties)
+      );
+
       if (existingItemIndex !== -1) {
         // If item already exists in the cart, update its quantity
         state.items[existingItemIndex].quantity += newItem.quantity;
@@ -62,8 +83,8 @@ const cartSlice = createSlice({
     // },
     deleteCartItem: (state, action) => {
       console.log(action.payload);
-      const { productId, variant } = action.payload;
-      const updatedCartItems = deleteFromCart(productId, variant);
+      const { productId, variantProperties } = action.payload;
+      const updatedCartItems = deleteFromCart(productId, variantProperties);
 
       state.items = updatedCartItems;
       state.count = state.items.length;
@@ -71,5 +92,6 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addNewCartItem, deleteCartItem } = cartSlice.actions;
+export const { addNewCartItem, deleteCartItem, refreshCart, resetCart } =
+  cartSlice.actions;
 export const cartReducer = cartSlice.reducer;

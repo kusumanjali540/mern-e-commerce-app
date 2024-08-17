@@ -7,13 +7,9 @@ const CheckOutProductItem = ({ items, isOpen }) => {
   let content;
   if (items.length > 0) {
     content = items.map((item, index) => {
-      const itemTotalPrice = calculateTotalPriceOfCartItem({
-        product: item.product,
-        variant: item.variant,
-        quantity: item.quantity,
-      });
+      const itemTotalPrice = item.product.product.price * item.quantity;
 
-      console.log("I got call!");
+      console.log(itemTotalPrice);
 
       return (
         <div key={index} className="flex flex-row items-center">
@@ -22,16 +18,16 @@ const CheckOutProductItem = ({ items, isOpen }) => {
               {item.quantity}
             </div>
             <img
-              src={item.product.pictures[0]}
+              src={item.product.product.pictures[0]}
               alt="product"
               className="h-full w-full object-cover rounded-xl"
             />
           </div>
           <div className="flex flex-col flex-1 justify-center px-6">
-            <div className="w-full">{item.product.name}</div>
+            <div className="w-full">{item.product.product.name}</div>
             <div className="text-slate-500">
               {Object.entries(
-                item.product.variants[item.variant].properties
+                item.product.product.properties
               ).map(([key, value]) => (
                 <p key={key}>
                   {key}: {value}

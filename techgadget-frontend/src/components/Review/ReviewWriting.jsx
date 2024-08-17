@@ -3,10 +3,14 @@ import { AiFillStar, AiOutlineStar, AiOutlineUpload } from "react-icons/ai";
 import { usePostReviewMutation } from "../../features";
 import Rating from "react-rating";
 import { validateReviewForm } from "../../services/validateFormService";
+import { useParams } from "react-router-dom";
+import { showErrorToast } from "../../services/showErrorToast";
+import toast from "react-hot-toast";
 
 const ReviewWriting = ({ className, style, onClose }) => {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
-    productId: "65ff9c513aa23e2ef4083969",
+    productId: id,
     title: "",
     comment: "",
     reviewer: "",
@@ -17,7 +21,7 @@ const ReviewWriting = ({ className, style, onClose }) => {
   const [image, setImage] = useState();
   const inputRef = useRef(null);
   const [formErrors, setFormErrors] = useState([]);
-  const [postReview, results] = usePostReviewMutation();
+  const [postReview, { isLoading, isError }] = usePostReviewMutation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -75,8 +79,13 @@ const ReviewWriting = ({ className, style, onClose }) => {
     for (const entry of newFormData.entries()) {
       console.log(entry);
     }
+    try {
+      await postReview(newFormData);
 
-    await postReview(newFormData);
+      toast.success("Review got submitted!");
+    } catch (err) {
+      showErrorToast(err);
+    }
   };
 
   return (
@@ -207,10 +216,15 @@ const ReviewWriting = ({ className, style, onClose }) => {
       <div className="w-full flex flex-col">
         <button
           type="submit"
-          className="px-4 py-2 bg-black text-white mb-2"
           onClick={handleSubmitForm}
+          disabled={isLoading}
+          className={`px-4 py-2 mb-2 ${
+            isLoading
+              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
         >
-          Submit Review
+          {isLoading ? "Submitting..." : "Submit Review"}
         </button>
         <button
           type="button"

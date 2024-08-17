@@ -3,6 +3,7 @@ import AddNewPropertyInput from "./AddNewPropertyInput";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useAddProductMutation } from "../../../features";
 import { productObject2FormData } from "../../../services/helper";
+import { showErrorToast } from "../../../services/showErrorToast";
 
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ const AddProductForm = () => {
         pictures: [],
       });
     } catch (err) {
-      console.log(err);
+      showErrorToast(err);
     }
   };
 

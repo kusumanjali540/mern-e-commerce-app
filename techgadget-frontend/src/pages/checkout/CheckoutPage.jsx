@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import OrderSummary from "../../components/Checkout/OrderSummary";
 import ContactDelivery from "../../components/Checkout/ContactDelivery";
 import Payment from "../../components/Checkout/Payment";
 import { useDispatch, useSelector } from "react-redux";
 import {
   resetAddress,
+  resetCart,
   useAddCustomerMutation,
   useAddOrderMutation,
   useCreateCheckoutSessionMutation,
+  useEditOrderMutation,
   useLazyFetchProductQuery,
 } from "../../features";
-import toast from "react-hot-toast";
 import { loadStripe } from "@stripe/stripe-js";
+import { useLazyFetchProductWithSelectedVariantQuery } from "../../features/apis/productsApi";
+import { showErrorToast } from "../../services/showErrorToast";
+import { emptyCart } from "../../services/useLocalStorageService";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -19,91 +23,74 @@ const CheckoutPage = () => {
   const deliveryAddress = useSelector((state) => state.address);
   const [addCustomer, { isLoading, isError }] = useAddCustomerMutation();
   const [addOrder, { isOrderLoading, isOrderError }] = useAddOrderMutation();
+  const [orderItems, setOrderItems] = useState([]);
+
+  const addressFormRef = useRef();
 
   const [createCheckoutSession, { isCheckoutLoading, isCheckoutError }] =
     useCreateCheckoutSessionMutation();
-  const [productArr, setProductArr] = useState([]);
 
-  console.log(productArr);
-  const [trigger, result, lastPromiseInfo] = useLazyFetchProductQuery();
+  const [trigger, { isFetching: isFetchingOrderItem }] =
+    useLazyFetchProductWithSelectedVariantQuery();
+
+  const customer = {
+    email: "john.doe@example.com",
+    firstName: "John",
+    lastName: "Doe",
+    address: "123 Maple Street",
+    country: "United States",
+    city: "Springfield",
+    state: "Illinois",
+    zipcode: "62704",
+  };
+
+  console.log(isFetchingOrderItem);
+  console.log("Order Here", orderItems);
+
+  const preFillAddressInformation = () => {
+    try {
+      // Get User Information
+      // setInput
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // const fetchProduct = async () => {
-    //   const items = [];
-    //   for (const cartItem of cartItems) {
-    //     try {
-    //       const response = await fetch(
-    //         `http://localhost:8080/product/${cartItem.productId}`
-    //       );
-    //       if (!response.ok) {
-    //         throw new Error("Failed to fetch product details");
-    //       }
-    //       const data = await response.json();
-    //       items.push({
-    //         product: data.product,
-    //         quantity: cartItem.quantity,
-    //         variant: cartItem.variant,
-    //       });
-    //     } catch (error) {
-    //       toast.error(error.message);
-    //     }
-    //   }
-    //   // Update state with fetched products
-    //   setProductArr(items);
-    // };
-
-    const fetchProduct = async () => {
-      const items = [];
-      for (const cartItem of cartItems) {
-        try {
-          // const response = await fetch(
-          //   `http://localhost:8080/product/${cartItem.productId}`
-          // );
-          await trigger(cartItem.productId);
-
-          console.log(result.data);
-          items.push({
-            product: result.data.product,
-            quantity: cartItem.quantity,
-            variant: cartItem.variant,
-          });
-        } catch (err) {
-          console.log(err);
-          // toast.error(err.data?.message);
-          // err.data.data?.forEach((msg) => {
-          //   toast.error(msg);
-          // });
-        }
-      }
-      // Update state with fetched products
-      setProductArr(items);
+    // Fetch product data for each cart item and update state
+    const fetchProducts = async () => {
+      const updatedCartItems = await Promise.all(
+        cartItems.map(async (item) => {
+          const product = await trigger(item).unwrap();
+          return { ...item, product };
+        })
+      );
+      setOrderItems(updatedCartItems);
     };
 
-    fetchProduct();
-  }, [cartItems]);
+    if (cartItems.length > 0) {
+      fetchProducts();
+    }
+
+    preFillAddressInformation();
+  }, [cartItems, trigger]);
 
   const handleSubmit = async () => {
-    // Push buyer's info to the database
-    const customer = {
-      email: deliveryAddress.emailPhone,
-      firstName: deliveryAddress.firstName,
-      lastName: deliveryAddress.lastName,
-      address: deliveryAddress.address,
-      country: deliveryAddress.country,
-      city: deliveryAddress.city,
-      state: deliveryAddress.stateName,
-      zipcode: deliveryAddress.zipcode,
-      status: "Guest",
-    };
-
     try {
-      const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PK_TEST);
+      // Create Order With Pending Status
+      console.log("This is item to order", orderItems);
 
-      const order = {
-        products: productArr,
-      };
+      const order = await addOrder({
+        items: orderItems,
+        status: "Pending",
+      }).unwrap();
+
+      console.log("Return order", order);
+
+      // Trigger stripe
+      const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PK_TEST);
 
       const session = await createCheckoutSession(order).unwrap();
 
@@ -111,45 +98,27 @@ const CheckoutPage = () => {
         sessionId: session.id,
       });
 
-      // const customerId = resultAddCustomer._id;
-      // Create a order with pending payment
-
-      // const order = {
-      //   // customerId: customerId,
-      //   // products: productArr,
-      //   // totalQuantity,
-      //   // totalPrice,
-      //   status: "Pending",
-      // };
-
-      // console.log(isLoading, isError);
-
-      // if (!isLoading && !isError) {
-      //   console.log("I Toast?");
-      //   toast.success("Add new customer successfully!");
-      // }
-
-      dispatch(resetAddress());
+      // If successfully, redirect to checkout success, payment status and other handling after payment are proceed there
     } catch (err) {
-      console.log(err);
-      //   toast.error(err.data.message);
-      //   err.data.data?.forEach((msg) => {
-      //     toast.error(msg);
-      //   });
+      showErrorToast(err);
     }
-
-    // Verify payment and change payment status
   };
 
   return (
     <div>
       <div className="flex flex-col justify-center items-center px-4 md:px-20 lg:px-48 py-8">
         <div className="w-full">
-          <ContactDelivery />
+          <ContactDelivery ref={addressFormRef} />
           <Payment />
         </div>
       </div>
-      <OrderSummary items={productArr} deliveryAddress={deliveryAddress} />
+      {isFetchingOrderItem ? (
+        "Loading Order Items..."
+      ) : orderItems.length > 0 ? (
+        <OrderSummary items={orderItems} deliveryAddress={deliveryAddress} />
+      ) : (
+        "Error has occured!"
+      )}
       <div className="flex flex-col px-4 py-8 justify-center items-center">
         <button
           className="w-full h-10 border bg-black text-white"
