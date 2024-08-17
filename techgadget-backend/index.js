@@ -32,9 +32,11 @@ app.use(
     name: "session",
     keys: ["somecookiesecretkey"],
     signed: false,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: "none", // Ensure SameSite is set to 'None' for cross-site cookies
-    secure: true, // Ensure the cookie is only sent over HTTPS
+    maxAge: 24 * 60 * 60 * 1000,
+    cookie: {
+      sameSite: "None",
+      secure: true,
+    },
   })
 );
 
