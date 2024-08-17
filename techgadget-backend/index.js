@@ -28,38 +28,7 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer();
 
-// const { v4: uuidv4 } = require("uuid");
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "images");
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, uuidv4());
-//   },
-// });
-
-// const fileFilter = (req, file, cb) => {
-//   if (
-//     file.mimetype === "image/png" ||
-//     file.mimetype === "image/jpg" ||
-//     file.mimetype === "image/jpeg"
-//   ) {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
-
 app.use(bodyParser.json());
-// app.use(
-//   bodyParser.urlencoded({
-//     extended: true,
-//   })
-// );
-
-// app.use(multer({ storage: storage, fileFilter: fileFilter }).single("image"));
-// app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(
   cookieSession({
@@ -67,6 +36,10 @@ app.use(
     keys: ["somecookiesecretkey"],
     signed: false,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    cookie: {
+      sameSite: "None", // Allow cookies to be sent across origins
+      secure: process.env.NODE_ENV === "production", // Ensure cookies are sent over HTTPS in production
+    },
   })
 );
 
