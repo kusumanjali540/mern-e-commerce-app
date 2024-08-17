@@ -73,7 +73,7 @@ app.use(
 //CORS
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://mern-e-commerce-app-api.vercel.app",
+  "https://mern-e-commerce-app-six.vercel.app",
 ];
 
 app.use((req, res, next) => {
