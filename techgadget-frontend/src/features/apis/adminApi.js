@@ -12,17 +12,11 @@ const adminApi = createApi({
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://mern-e-commerce-app-api.vercel.app/admin",
     baseUrl: `${ROOT_SERVER_URL}/admin`,
+    credentials: "include",
   }),
   endpoints(builder) {
     return {
       currentAdmin: builder.query({
-        // providesTags: (result, error, user) => {
-        //   const tags = result.map((admin) => {
-        //     return { type: 'Product', id: admin.id };
-        //   });
-        //   tags.push({ type: 'UsersProducts', id: user.id });
-        //   return tags;
-        // },
         query: () => {
           return {
             url: `/current-admin`,
@@ -30,30 +24,20 @@ const adminApi = createApi({
           };
         },
       }),
-      signUp: builder.mutation({
-        // invalidatesTags: (result, error, user) => {
-        //   return [{ type: 'UsersProducts', id: user.id }];
-        // },
+      signUpAdmin: builder.mutation({
         query: (formData) => {
           return {
             url: "/signup",
-            method: "PUT",
+            method: "POST",
             body: {
               email: formData.email,
               password: formData.password,
               secretcode: formData.secretcode,
-            }
+            },
           };
         },
       }),
-      signIn: builder.mutation({
-        // providesTags: (result, error, user) => {
-        //   const tags = result.map((admin) => {
-        //     return { type: 'Product', id: admin.id };
-        //   });
-        //   tags.push({ type: 'UsersProducts', id: user.id });
-        //   return tags;
-        // },
+      signInAdmin: builder.mutation({
         query: (formData) => {
           return {
             url: `/login`,
@@ -61,19 +45,12 @@ const adminApi = createApi({
             body: {
               email: formData.email,
               password: formData.password,
-            }
+            },
           };
         },
       }),
-      signOut: builder.mutation({
-        // providesTags: (result, error, user) => {
-        //   const tags = result.map((admin) => {
-        //     return { type: 'Product', id: admin.id };
-        //   });
-        //   tags.push({ type: 'UsersProducts', id: user.id });
-        //   return tags;
-        // },
-        query: (formData) => {
+      signOutAdmin: builder.mutation({
+        query: () => {
           return {
             url: `/signout`,
             method: "POST",
@@ -85,9 +62,9 @@ const adminApi = createApi({
 });
 
 export const {
-  useSignUpMutation,
-  useSignInMutation,
-  useSignOutMutation,
-  useCurrentAdminQuery
+  useSignUpAdminMutation,
+  useSignInAdminMutation,
+  useSignOutAdminMutation,
+  useCurrentAdminQuery,
 } = adminApi;
 export { adminApi };

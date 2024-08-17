@@ -1,22 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const DropdownAddress = ({ onChange, options }) => {
-  const [selectedOption, setSelectedOption] = useState();
+const DropdownAddress = ({ onChange, options, initialValue }) => {
+  const [selectedOption, setSelectedOption] = useState("");
+
+  useEffect(() => {
+    // Reset selectedOption when options or initialValue changes
+    setSelectedOption(initialValue ? JSON.stringify(initialValue) : "");
+  }, [options, initialValue]);
 
   const handleSelectChange = (event) => {
     const selectedValue = JSON.parse(event.target.value);
-    setSelectedOption(selectedValue);
+    setSelectedOption(event.target.value); // Update selectedOption to the new value
     onChange(selectedValue);
   };
 
   return (
     <select
-      value={selectedOption ? JSON.stringify(selectedOption) : ""}
+      value={selectedOption}
       onChange={handleSelectChange}
       className="h-12 w-full md:min-w-40 lg:min-w-52 border rounded-md outline-none"
     >
-      <option value="" disabled selected>
-        Select an option
+      <option value="" disabled={!selectedOption}>
+        {initialValue ? initialValue : "Select an option"}
       </option>
       {options.map((option) => (
         <option key={option.val} value={JSON.stringify(option)}>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAddCustomerMutation } from "../../../features";
 import toast from "react-hot-toast";
 import { TailSpin } from "react-loading-icons";
+import { showErrorToast } from "../../../services/showErrorToast";
 
 const AddCustomerForm = () => {
   const [formData, setFormData] = useState({
@@ -45,11 +46,7 @@ const AddCustomerForm = () => {
         status: "SignedUp",
       });
     } catch (err) {
-      console.log(err);
-      toast.error(err.data.message);
-      err.data.data?.forEach((msg) => {
-        toast.error(msg);
-      });
+      showErrorToast(err);
     }
   };
 

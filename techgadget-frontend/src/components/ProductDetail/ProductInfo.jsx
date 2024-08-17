@@ -56,7 +56,7 @@ const ProductInfo = ({ product, error, isFetching }) => {
 
     const newCartItem = {
       productId: product._id,
-      variant: selectedVariant.index,
+      variantProperties: selectedVariant.properties,
       quantity: quantity,
       timestamp: Date.now(),
     };
@@ -69,7 +69,12 @@ const ProductInfo = ({ product, error, isFetching }) => {
 
     setTimeout(() => {
       // Pop up add to cart notification
-      dispatch(openModal({ ...product, variant: newCartItem.variant }));
+      dispatch(
+        openModal({
+          ...product,
+          variantProperties: newCartItem.variantProperties,
+        })
+      );
     }, 200);
   };
 
@@ -93,7 +98,8 @@ const ProductInfo = ({ product, error, isFetching }) => {
           index: -1,
         })
       );
-    } else { // Update the atributes of selected variant of the product
+    } else {
+      // Update the atributes of selected variant of the product
       dispatch(
         changeVariant({
           ...selectedVariant,

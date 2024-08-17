@@ -8,8 +8,6 @@ import {
 const EditCustomerForm = ({ customer, onClose }) => {
   const [formData, setFormData] = useState(customer);
 
-  console.log(customer);
-
   const [editCustomer, { isLoading: editLoading, isError: editError }] =
     useEditCustomerMutation();
 
@@ -41,7 +39,7 @@ const EditCustomerForm = ({ customer, onClose }) => {
         city: "",
         state: "",
         zipcode: "",
-        status: "SignedUp",
+        status: "SignedUp"
       });
     } catch (err) {
       toast.error(err.data.message);

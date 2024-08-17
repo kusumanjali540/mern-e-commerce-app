@@ -4,6 +4,7 @@ import {
   useEditCustomerMutation,
   useRemoveCustomerMutation,
 } from "../../../features";
+import { showErrorToast } from "../../../services/showErrorToast";
 
 const EditCustomerForm = ({ customer, onClose }) => {
   const [formData, setFormData] = useState(customer);
@@ -44,10 +45,7 @@ const EditCustomerForm = ({ customer, onClose }) => {
         status: "SignedUp",
       });
     } catch (err) {
-      toast.error(err.data.message);
-      err.data.data?.forEach((msg) => {
-        toast.error(msg);
-      });
+      showErrorToast(err);
     }
   };
 
@@ -85,10 +83,7 @@ const EditCustomerForm = ({ customer, onClose }) => {
         status: "SignedUp",
       });
     } catch (err) {
-      toast.error(err.data.message);
-      err.data.data?.forEach((msg) => {
-        toast.error(msg);
-      });
+      showErrorToast(err);
     }
   };
 

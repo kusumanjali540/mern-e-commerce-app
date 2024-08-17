@@ -1,7 +1,13 @@
 import React from "react";
 
 // Only works when width is known, not apply for height. Unexpected behavior when working with iterating over collections. Noted: pass the width seperated into the props
-const ResponsiveSquare = ({ src, width, alt, onLoad= () => {}, className = "" }) => {
+const ResponsiveSquare = ({
+  src,
+  width,
+  alt,
+  onLoad = () => {},
+  className = "",
+}) => {
   return (
     <div
       className="relative overflow-hidden"

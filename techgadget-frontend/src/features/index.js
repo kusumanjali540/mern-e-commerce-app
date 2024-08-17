@@ -4,25 +4,35 @@ import {
   openModal,
   closeModal,
 } from "./slices/notificationSlice";
-import { updateAddress, resetAddress, addressReducer } from "./slices/addressSlice";
-import { changeVariant, selectedVariantReducer } from "./slices/selectedVariantSlice";
-import { addNewCartItem, deleteCartItem } from "./slices/cartSlice";
-import { login, logout } from "./slices/adminSlice";
+import {
+  updateAddress,
+  resetAddress,
+  addressReducer,
+} from "./slices/addressSlice";
+import {
+  changeVariant,
+  selectedVariantReducer,
+} from "./slices/selectedVariantSlice";
+import {
+  addNewCartItem,
+  deleteCartItem,
+  refreshCart,
+  resetCart,
+} from "./slices/cartSlice";
 import { testApi } from "./apis/testApi";
 import { productsApi } from "./apis/productsApi";
 import { reviewsApi } from "./apis/reviewsApi";
 import { cartReducer } from "./slices/cartSlice";
-import { adminReducer } from "./slices/adminSlice";
 import { adminApi } from "./apis/adminApi";
 import { customersApi } from "./apis/customersApi";
 import { ordersApi } from "./apis/ordersApi";
 import { contactApi } from "./apis/contactApi";
+import { userAuthApi } from "./apis/userAuthApi";
 
 const store = configureStore({
   reducer: {
     notification: notificationReducer,
     cart: cartReducer,
-    admin: adminReducer,
     address: addressReducer,
     selectedVariant: selectedVariantReducer,
     [testApi.reducerPath]: testApi.reducer,
@@ -32,6 +42,7 @@ const store = configureStore({
     [customersApi.reducerPath]: customersApi.reducer,
     [ordersApi.reducerPath]: ordersApi.reducer,
     [contactApi.reducerPath]: contactApi.reducer,
+    [userAuthApi.reducerPath]: userAuthApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware()
@@ -41,7 +52,8 @@ const store = configureStore({
       .concat(adminApi.middleware)
       .concat(ordersApi.middleware)
       .concat(customersApi.middleware)
-      .concat(contactApi.middleware);
+      .concat(contactApi.middleware)
+      .concat(userAuthApi.middleware);
   },
 });
 
@@ -52,13 +64,25 @@ export {
   changeVariant,
   addNewCartItem,
   deleteCartItem,
-  login, logout,
+  refreshCart,
+  resetCart,
   updateAddress,
-  resetAddress
+  resetAddress,
 };
 export { useUploadFileMutation } from "./apis/testApi";
-export { usePostReviewMutation } from "./apis/reviewsApi";
-export { useSignInMutation, useSignUpMutation, useSignOutMutation, useCurrentAdminQuery } from "./apis/adminApi";
+export { usePostReviewMutation, useFetchReviewsQuery } from "./apis/reviewsApi";
+export {
+  useSignInAdminMutation,
+  useSignUpAdminMutation,
+  useSignOutAdminMutation,
+  useCurrentAdminQuery,
+} from "./apis/adminApi";
+export {
+  useSignInUserMutation,
+  useSignUpUserMutation,
+  useSignOutUserMutation,
+  useCurrentUserQuery,
+} from "./apis/userAuthApi";
 export { useSubmitContactFormMutation } from "./apis/contactApi";
 export {
   useFetchProductsQuery,
@@ -67,19 +91,25 @@ export {
   useRemoveProductMutation,
   useEditProductMutation,
   useFetchAllProductsQuery,
-  useLazyFetchProductQuery
+  useLazyFetchProductQuery,
+  useFetchFindByNameProductsQuery,
+  useFetchProductWithSelectedVariantQuery,
+  useLazyFetchProductWithSelectedVariantQuery,
 } from "./apis/productsApi";
 export {
   useFetchCustomersQuery,
   useFetchCustomerQuery,
+  useFetchCustomerBySessionQuery,
   useAddCustomerMutation,
   useRemoveCustomerMutation,
+  useEditCustomerBySessionMutation,
   useEditCustomerMutation,
 } from "./apis/customersApi";
 export {
   useFetchOrdersQuery,
+  useFetchOrdersBySessionQuery,
   useAddOrderMutation,
   useRemoveOrderMutation,
   useEditOrderMutation,
-  useCreateCheckoutSessionMutation
+  useCreateCheckoutSessionMutation,
 } from "./apis/ordersApi";

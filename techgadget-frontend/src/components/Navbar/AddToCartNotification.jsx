@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { openModal, closeModal, useFetchProductQuery } from "../../features";
+import { closeModal } from "../../features";
 import { Link } from "react-router-dom";
 
 const AddToCartNotification = () => {
@@ -40,16 +40,16 @@ const AddToCartNotification = () => {
           </div>
           <div className="flex flex-col">
             <div>{addedProduct?.name}</div>
-            {addedProduct &&
-              Object.entries(
-                addedProduct.variants[addedProduct.variant].properties
-              ).map(([key, value]) => (
-                <div key={key}>
-                  <p>
-                    {key}: {value}
-                  </p>
-                </div>
-              ))}
+            {addedProduct?.variantProperties &&
+              Object.entries(addedProduct.variantProperties).map(
+                ([key, value]) => (
+                  <div key={key}>
+                    <p>
+                      {key}: {value}
+                    </p>
+                  </div>
+                )
+              )}
           </div>
         </div>
         <Link to="/cart">
@@ -61,7 +61,7 @@ const AddToCartNotification = () => {
           </button>
         </Link>
 
-        <Link>
+        <Link to="/checkout">
           <button
             className="w-full h-12 border-2 mb-2 bg-black text-white"
             onClick={handleCloseModal}

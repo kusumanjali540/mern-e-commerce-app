@@ -11,17 +11,16 @@ const reviewsApi = createApi({
   reducerPath: "reviews",
   baseQuery: fetchBaseQuery({
     baseUrl: `${ROOT_SERVER_URL}/review`,
-    // fetchFn: async (...args) => {
-    //   await pause(1000);
-    //   return fetch(...args);
-    // },
+    credentials: 'include',
   }),
   endpoints(builder) {
     return {
       postReview: builder.mutation({
-        // invalidatesTags: (result, error, user) => {
-        //   return [{ type: 'UsersProducts', id: user.id }];
-        // },
+        invalidatesTags: (result, error, arg) => {
+          console.log(arg);
+
+          return [{ type: "Review", id: arg.id }];
+        },
         query: (formData) => {
           return {
             url: "/post-review",
@@ -30,27 +29,30 @@ const reviewsApi = createApi({
           };
         },
       }),
-      //   fetchProducts: builder.query({
-      //     // providesTags: (result, error, user) => {
-      //     //   const tags = result.map((review) => {
-      //     //     return { type: 'Product', id: review.id };
-      //     //   });
-      //     //   tags.push({ type: 'UsersProducts', id: user.id });
-      //     //   return tags;
-      //     // },
-      //     query: (user) => {
-      //       return {
-      //         url: "/reviews",
-      //         method: "GET",
-      //         headers: {
-      //           "Content-Type": "application/json",
-      //         },
-      //       };
-      //     },
-      //   }),
+      fetchReviews: builder.query({
+        providesTags: (result, error, arg) => {
+          console.log(result);
+          return result?.reviews
+            ? [
+                ...result.reviews.map(({ id }) => ({ type: "Review", id })),
+                "Review",
+              ]
+            : ["Review"];
+        },
+        query: ({ productId }) => {
+          console.log(productId);
+          return {
+            url: `/reviews/${productId}`,
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+        },
+      }),
     };
   },
 });
 
-export const { usePostReviewMutation } = reviewsApi;
+export const { usePostReviewMutation, useFetchReviewsQuery } = reviewsApi;
 export { reviewsApi };

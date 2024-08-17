@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export const setCartItemsWithTimestamps = (cartItems) => {
   localStorage.setItem("cartData", JSON.stringify(cartItems));
 };
@@ -27,11 +29,14 @@ export const addToCart = (newCartItem) => {
   const existingCartItemIndex = cartItemsWithTimestamps.findIndex(
     (item) =>
       item.productId === newCartItem.productId &&
-      item.variant === newCartItem.variant
+      _.isEqual(item.variantProperties, newCartItem.variantProperties)
   );
+
+  console.log(existingCartItemIndex);
 
   // If the product is already in the cart, update its quantity
   if (existingCartItemIndex !== -1) {
+    console.log(cartItemsWithTimestamps[existingCartItemIndex]);
     cartItemsWithTimestamps[existingCartItemIndex].quantity +=
       newCartItem.quantity;
     cartItemsWithTimestamps[existingCartItemIndex].timestamp = Date.now();
@@ -44,11 +49,13 @@ export const addToCart = (newCartItem) => {
   console.log(getCartItemsWithTimestamps());
 };
 
-export const deleteFromCart = (productId, variant) => {
+export const deleteFromCart = (productId, variantProperties) => {
   const cartItemsWithTimestamps = getCartItemsWithTimestamps();
 
   const itemIndexToRemove = cartItemsWithTimestamps.findIndex(
-    (item) => item.productId === productId && item.variant === variant
+    (item) =>
+      item.productId === productId &&
+      _.isEqual(item.variantProperties, variantProperties)
   );
 
   if (itemIndexToRemove !== -1) {
@@ -59,11 +66,21 @@ export const deleteFromCart = (productId, variant) => {
   return getCartItemsWithTimestamps();
 };
 
-export const updateQuantityInCart = (productId, variant, quantityChange) => {
+export const emptyCart = () => {
+  localStorage.removeItem("cartData");
+};
+
+export const updateQuantityInCart = (
+  productId,
+  variantProperties,
+  quantityChange
+) => {
   const cartItemsWithTimestamps = getCartItemsWithTimestamps();
 
   const itemToUpdateIndex = cartItemsWithTimestamps.findIndex(
-    (item) => item.productId === productId && item.variant === variant
+    (item) =>
+      item.productId === productId &&
+      _.isEqual(item.variantProperties, variantProperties)
   );
 
   if (itemToUpdateIndex !== -1) {

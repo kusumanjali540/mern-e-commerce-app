@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Logo from "../shared/Logo";
 import HamburgerButton from "../shared/HamburgerButton";
-import { logout, useSignOutMutation } from "../../features";
-import { useDispatch } from "react-redux";
+import { useSignOutAdminMutation } from "../../features";
 
 const AdminNavbar = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [signOut] = useSignOutMutation();
+  const [signOut] = useSignOutAdminMutation();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -17,8 +15,6 @@ const AdminNavbar = () => {
   };
 
   const handleLogOut = async () => {
-    dispatch(logout());
-
     await signOut();
 
     navigate("/admin");

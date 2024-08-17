@@ -11,6 +11,7 @@ const contactApi = createApi({
   reducerPath: "contact",
   baseQuery: fetchBaseQuery({
     baseUrl: `${ROOT_SERVER_URL}/contact`,
+    credentials: 'include',
     // fetchFn: async (...args) => {
     //   await pause(1000);
     //   return fetch(...args);
@@ -19,9 +20,6 @@ const contactApi = createApi({
   endpoints(builder) {
     return {
       submitContactForm: builder.mutation({
-        // invalidatesTags: (result, error, user) => {
-        //   return [{ type: 'UsersProducts', id: user.id }];
-        // },
         query: (formData) => {
           return {
             url: "/submit-contact-form",

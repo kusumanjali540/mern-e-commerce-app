@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/Navbar/NavBar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
 import AnouncementBar from "../components/AnouncementBar";
 import { Toaster } from "react-hot-toast";
 import Modal from "react-modal";
+import { motion, AnimatePresence } from "framer-motion";
 
 Modal.setAppElement("#root");
 
 const Layout = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const location = useLocation();
+
+  const topLevelPath = location.pathname.split("/")[1];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,7 +32,17 @@ const Layout = () => {
       <Toaster position="top-center" />
       <AnouncementBar />
       <NavBar />
-      <Outlet />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={topLevelPath}
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <Outlet />
+        </motion.div>
+      </AnimatePresence>
+
       <Footer />
       <Modal
         isOpen={isModalOpen}

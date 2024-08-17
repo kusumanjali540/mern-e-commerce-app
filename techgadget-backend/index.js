@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const fs = require("fs");
-const cookieSession = require('cookie-session');
+const cookieSession = require("cookie-session");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -20,6 +20,8 @@ const orderRoutes = require("./routes/order");
 const adminRoutes = require("./routes/admin");
 const contactRoutes = require("./routes/contact");
 const currentAdmin = require("./middleware/current-admin");
+const errorHandler = require("./middleware/error-handler");
+const currentCustomer = require("./middleware/current-customer");
 
 const app = express();
 
@@ -61,21 +63,24 @@ app.use(bodyParser.json());
 
 app.use(
   cookieSession({
-    name: 'session',
-    keys: ['somesecretkey'], // Use a strong secret key
-
-    // Cookie options
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    name: "session",
+    keys: ["somecookiesecretkey"],
+    signed: false,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
 
 //CORS
-const allowedOrigins = ['http://localhost:3000', 'https://mern-e-commerce-app-api.vercel.app'];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://mern-e-commerce-app-api.vercel.app",
+];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
   }
 
   res.setHeader(
@@ -83,10 +88,16 @@ app.use((req, res, next) => {
     "GET, POST, PATCH, PUT, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
   next();
 });
 
 app.use(currentAdmin);
+app.use(currentCustomer);
 
 // Routes
 app.use("/product", productRoutes);
@@ -97,15 +108,7 @@ app.use("/order", orderRoutes);
 app.use("/admin", adminRoutes);
 app.use("/contact", contactRoutes);
 
-app.use((error, req, res, next) => {
-  console.log(error);
-  const status = error.statusCode || 500;
-  const message = error.message;
-  const data = error.data?.map((err) => {
-    return err.msg;
-  });
-  res.status(status).json({ message: message, data: data });
-});
+app.use(errorHandler);
 
 mongoose
   .connect(process.env.MONGODB_CONNECT)
