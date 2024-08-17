@@ -31,8 +31,6 @@ const upload = multer();
 
 app.use(bodyParser.json());
 
-app.use(cors({ credentials: true, origin: true }));
-
 app.use(
   cookieSession({
     name: "session",
