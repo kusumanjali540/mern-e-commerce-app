@@ -6,7 +6,6 @@ const multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const fs = require("fs");
 const cookieSession = require("cookie-session");
-const cors = require("cors");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -25,9 +24,6 @@ const errorHandler = require("./middleware/error-handler");
 const currentCustomer = require("./middleware/current-customer");
 
 const app = express();
-
-const storage = multer.memoryStorage();
-const upload = multer();
 
 app.use(bodyParser.json());
 
