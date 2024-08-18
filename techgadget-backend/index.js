@@ -27,6 +27,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.set('trust proxy', 1);
+
 app.use(
   cookieSession({
     name: "session",
