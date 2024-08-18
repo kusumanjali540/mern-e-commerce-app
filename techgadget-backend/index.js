@@ -27,7 +27,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 app.use(
   cookieSession({
@@ -35,10 +35,9 @@ app.use(
     keys: ["somecookiesecretkey"],
     signed: false,
     maxAge: 24 * 60 * 60 * 1000,
-    cookie: {
-      sameSite: "None",
-      secure: true,
-    },
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
   })
 );
 
